@@ -120,7 +120,7 @@ a:hover .tooltip {
     height: 100%;
     transform-style: preserve-3d;
     transform-origin: 50% 50% -50vw;
-    transform: rotateY(-90deg);
+    transform: rotateY(-180deg);
     transition: transform .5s;
 }
 
@@ -139,6 +139,11 @@ a:hover .tooltip {
 
 .section.about {
     transform: translateX(50vw) translateZ(-50vw) rotateY(90deg);
+}
+
+.section.resume {
+    transform: translateZ(-100vw) rotateY(-180deg);
+    transform-origin: 50%;
 }
 
 .home,
@@ -257,6 +262,69 @@ a:hover .tooltip {
 
 .about-info .btn {
     padding: 1.2rem 4rem;
+}
+
+.resume {
+    padding-top: 2rem;
+    padding-bottom: 28rem;
+
+}
+
+.tab-box {
+    display: flex;
+    width: 100%;
+    height: 5rem;
+    margin-bottom: 2rem;
+    margin-top: 1rem;
+}
+
+.tab-list {
+    display: flex;
+    width: 100%;
+    align-items: center;
+    border-bottom: .3rem solid var(--tab-list-color);
+    cursor: pointer;
+    color: var(--tab-list-color);
+    transition: .5s;
+}
+
+.tab-list.resume-list.active {
+    border-color: var(--main-color);
+    color: var(--main-color);
+}
+
+.resume-list:nth-child(2) {
+    justify-content: center; 
+}
+
+.resume-list:nth-child(3) {
+    justify-content: flex-end;
+}
+
+.tab-list h3 {
+    font-size: 2.5rem;
+}
+
+.tab-wrapper {
+    position: relative;
+    width: 100%;
+    height: 100%;
+} 
+
+.tab-grid {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    visibility: hidden;
+    opacity: 0;
+    transform: scale(.8);
+}
+
+.tab-grid.resume-box.active {
+    visibility: visible;
+    opacity: 1;
+    transform: scale(1);
+    transition: .5s;
 }
 
 
