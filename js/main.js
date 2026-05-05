@@ -230,7 +230,12 @@ class ResumeTabs {
         const activeContent = document.querySelector('.tab-content.active');
         const nextContent = document.getElementById(targetId);
 
-        if (!nextContent || activeContent === nextContent) return;
+        if (!nextContent) return;
+
+        if (activeContent === nextContent) {
+            this.scrollResumeToPanel(nextContent);
+            return;
+        }
         
         // Update tabs
         this.tabs.forEach(t => {
@@ -254,7 +259,7 @@ class ResumeTabs {
                 this.animateSkillBars();
             }
 
-            this.scrollResumeToPanels();
+            this.scrollResumeToPanel(nextContent);
             document.dispatchEvent(new CustomEvent('scrollcontentchange'));
         }, activeContent ? 220 : 0);
 
@@ -266,13 +271,12 @@ class ResumeTabs {
         }
     }
 
-    scrollResumeToPanels() {
+    scrollResumeToPanel(panel) {
         const resumeSection = document.getElementById('resume');
-        const tabs = document.querySelector('.resume-tabs');
-        if (!resumeSection || !tabs) return;
+        if (!resumeSection || !panel) return;
 
         resumeSection.scrollTo({
-            top: Math.max(tabs.offsetTop - 20, 0),
+            top: Math.max(panel.offsetTop - 24, 0),
             behavior: 'smooth'
         });
     }
