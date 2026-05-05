@@ -17,9 +17,6 @@
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-    <!-- Three.js Background Canvas -->
-    <canvas id="bg-canvas"></canvas>
-    
     <!-- Navigation -->
     <header class="header">
         <a href="#home" class="logo">
@@ -56,6 +53,8 @@
     
     <!-- Main Content -->
     <main class="main-content">
+        <div class="cube-scene" aria-live="polite">
+            <div class="site-cube" id="site-cube">
         
         <!-- Home Section -->
         <section class="section home active" id="home">
@@ -73,7 +72,7 @@
                     </p>
                     
                     <div class="home-buttons">
-                        <a href="assets/resume.pdf" download class="btn btn-primary">
+                        <a href="#resume" class="btn btn-primary" data-download-resume>
                             <i class='bx bx-download'></i>
                             Download CV
                         </a>
@@ -84,13 +83,13 @@
                     </div>
                     
                     <div class="social-links">
-                        <a href="[github.com](https://github.com/yourusername)" target="_blank" class="social-link" aria-label="GitHub">
+                        <a href="https://github.com/yourusername" target="_blank" rel="noopener noreferrer" class="social-link" aria-label="GitHub">
                             <i class='bx bxl-github'></i>
                         </a>
-                        <a href="[linkedin.com](https://linkedin.com/in/yourusername)" target="_blank" class="social-link" aria-label="LinkedIn">
+                        <a href="https://linkedin.com/in/yourusername" target="_blank" rel="noopener noreferrer" class="social-link" aria-label="LinkedIn">
                             <i class='bx bxl-linkedin'></i>
                         </a>
-                        <a href="[youtube.com](https://youtube.com/@yourusername)" target="_blank" class="social-link" aria-label="YouTube">
+                        <a href="https://youtube.com/@yourusername" target="_blank" rel="noopener noreferrer" class="social-link" aria-label="YouTube">
                             <i class='bx bxl-youtube'></i>
                         </a>
                     </div>
@@ -165,7 +164,7 @@
                         </div>
                     </div>
                     
-                    <a href="#resume" class="btn btn-primary">
+                    <a href="#resume" class="btn btn-primary" data-section-target="resume">
                         <i class='bx bx-right-arrow-alt'></i>
                         View More
                     </a>
@@ -182,23 +181,23 @@
             
             <div class="resume-container">
                 <!-- Resume Tabs -->
-                <div class="resume-tabs">
-                    <button class="tab-btn active" data-tab="experience">
+            <div class="resume-tabs" role="tablist" aria-label="Resume sections">
+                    <button type="button" class="tab-btn active" data-tab="experience" aria-controls="experience" aria-selected="true">
                         <i class='bx bx-briefcase'></i>
                         Experience
                     </button>
-                    <button class="tab-btn" data-tab="skills">
+                    <button type="button" class="tab-btn" data-tab="skills" aria-controls="skills" aria-selected="false">
                         <i class='bx bx-code-alt'></i>
                         Skills
                     </button>
-                    <button class="tab-btn" data-tab="education">
+                    <button type="button" class="tab-btn" data-tab="education" aria-controls="education" aria-selected="false">
                         <i class='bx bx-book'></i>
                         Education
                     </button>
                 </div>
                 
                 <!-- Experience Tab -->
-                <div class="tab-content active" id="experience">
+                <div class="tab-content active" id="experience" role="tabpanel">
                     <div class="timeline">
                         <div class="timeline-item">
                             <div class="timeline-marker"><i class='bx bx-briefcase'></i></div>
@@ -245,7 +244,7 @@
                 </div>
                 
                 <!-- Skills Tab -->
-                <div class="tab-content" id="skills">
+                <div class="tab-content" id="skills" role="tabpanel">
                     <div class="skills-container">
                         <div class="skills-category">
                             <h3><i class='bx bx-code-curly'></i> Frontend</h3>
@@ -348,7 +347,7 @@
                 </div>
                 
                 <!-- Education Tab -->
-                <div class="tab-content" id="education">
+                <div class="tab-content" id="education" role="tabpanel">
                     <div class="timeline">
                         <div class="timeline-item">
                             <div class="timeline-marker"><i class='bx bx-book'></i></div>
@@ -401,25 +400,25 @@
             </div>
             
             <div class="portfolio-filters">
-                <button class="filter-btn active" data-filter="all">All</button>
-                <button class="filter-btn" data-filter="web">Web Apps</button>
-                <button class="filter-btn" data-filter="mobile">Mobile</button>
-                <button class="filter-btn" data-filter="design">Design</button>
+                <button type="button" class="filter-btn active" data-filter="all" aria-pressed="true">All</button>
+                <button type="button" class="filter-btn" data-filter="web" aria-pressed="false">Web Apps</button>
+                <button type="button" class="filter-btn" data-filter="mobile" aria-pressed="false">Mobile</button>
+                <button type="button" class="filter-btn" data-filter="design" aria-pressed="false">Design</button>
             </div>
             
             <div class="portfolio-grid">
-                <div class="portfolio-item" data-category="web">
+                <div class="portfolio-item" data-category="web" data-project="ecommerce">
                     <div class="portfolio-image">
-                        <img src="[via.placeholder.com](https://via.placeholder.com/600x400/6c63ff/ffffff?text=Project+1)" alt="Project 1">
+                        <img src="https://via.placeholder.com/600x400/6c63ff/ffffff?text=Project+1" alt="Project 1">
                         <div class="portfolio-overlay">
                             <div class="portfolio-info">
                                 <h3>E-Commerce Platform</h3>
                                 <p>Full-stack web application</p>
                                 <div class="portfolio-links">
-                                    <a href="#" class="portfolio-link" aria-label="View Live">
+                                    <a href="#project-ecommerce" class="portfolio-link" data-project-action="demo" aria-label="View Live">
                                         <i class='bx bx-link-external'></i>
                                     </a>
-                                    <a href="#" class="portfolio-link" aria-label="View Code">
+                                    <a href="#project-ecommerce-code" class="portfolio-link" data-project-action="code" aria-label="View Code">
                                         <i class='bx bxl-github'></i>
                                     </a>
                                 </div>
@@ -433,18 +432,18 @@
                     </div>
                 </div>
                 
-                <div class="portfolio-item" data-category="mobile">
+                <div class="portfolio-item" data-category="mobile" data-project="fitness">
                     <div class="portfolio-image">
-                        <img src="[via.placeholder.com](https://via.placeholder.com/600x400/ff6584/ffffff?text=Project+2)" alt="Project 2">
+                        <img src="https://via.placeholder.com/600x400/ff6584/ffffff?text=Project+2" alt="Project 2">
                         <div class="portfolio-overlay">
                             <div class="portfolio-info">
                                 <h3>Fitness Tracker App</h3>
                                 <p>Cross-platform mobile app</p>
                                 <div class="portfolio-links">
-                                    <a href="#" class="portfolio-link" aria-label="View Live">
+                                    <a href="#project-fitness" class="portfolio-link" data-project-action="demo" aria-label="View Live">
                                         <i class='bx bx-link-external'></i>
                                     </a>
-                                    <a href="#" class="portfolio-link" aria-label="View Code">
+                                    <a href="#project-fitness-code" class="portfolio-link" data-project-action="code" aria-label="View Code">
                                         <i class='bx bxl-github'></i>
                                     </a>
                                 </div>
@@ -457,18 +456,18 @@
                     </div>
                 </div>
                 
-                <div class="portfolio-item" data-category="web">
+                <div class="portfolio-item" data-category="web" data-project="tasks">
                     <div class="portfolio-image">
-                        <img src="[via.placeholder.com](https://via.placeholder.com/600x400/43d9ad/ffffff?text=Project+3)" alt="Project 3">
+                        <img src="https://via.placeholder.com/600x400/43d9ad/ffffff?text=Project+3" alt="Project 3">
                         <div class="portfolio-overlay">
                             <div class="portfolio-info">
                                 <h3>Task Management Dashboard</h3>
                                 <p>Productivity web app</p>
                                 <div class="portfolio-links">
-                                    <a href="#" class="portfolio-link" aria-label="View Live">
+                                    <a href="#project-tasks" class="portfolio-link" data-project-action="demo" aria-label="View Live">
                                         <i class='bx bx-link-external'></i>
                                     </a>
-                                    <a href="#" class="portfolio-link" aria-label="View Code">
+                                    <a href="#project-tasks-code" class="portfolio-link" data-project-action="code" aria-label="View Code">
                                         <i class='bx bxl-github'></i>
                                     </a>
                                 </div>
@@ -482,18 +481,18 @@
                     </div>
                 </div>
                 
-                <div class="portfolio-item" data-category="design">
+                <div class="portfolio-item" data-category="design" data-project="brand">
                     <div class="portfolio-image">
-                        <img src="[via.placeholder.com](https://via.placeholder.com/600x400/ffc247/ffffff?text=Project+4)" alt="Project 4">
+                        <img src="https://via.placeholder.com/600x400/ffc247/ffffff?text=Project+4" alt="Project 4">
                         <div class="portfolio-overlay">
                             <div class="portfolio-info">
                                 <h3>Brand Identity System</h3>
                                 <p>Complete brand design</p>
                                 <div class="portfolio-links">
-                                    <a href="#" class="portfolio-link" aria-label="View Live">
+                                    <a href="#project-brand" class="portfolio-link" data-project-action="demo" aria-label="View Live">
                                         <i class='bx bx-link-external'></i>
                                     </a>
-                                    <a href="#" class="portfolio-link" aria-label="View Details">
+                                    <a href="#project-brand-details" class="portfolio-link" data-project-action="details" aria-label="View Details">
                                         <i class='bx bx-show'></i>
                                     </a>
                                 </div>
@@ -506,18 +505,18 @@
                     </div>
                 </div>
                 
-                <div class="portfolio-item" data-category="web">
+                <div class="portfolio-item" data-category="web" data-project="chat">
                     <div class="portfolio-image">
-                        <img src="[via.placeholder.com](https://via.placeholder.com/600x400/4a90d9/ffffff?text=Project+5)" alt="Project 5">
+                        <img src="https://via.placeholder.com/600x400/4a90d9/ffffff?text=Project+5" alt="Project 5">
                         <div class="portfolio-overlay">
                             <div class="portfolio-info">
                                 <h3>Real-time Chat Application</h3>
                                 <p>WebSocket-based messaging</p>
                                 <div class="portfolio-links">
-                                    <a href="#" class="portfolio-link" aria-label="View Live">
+                                    <a href="#project-chat" class="portfolio-link" data-project-action="demo" aria-label="View Live">
                                         <i class='bx bx-link-external'></i>
                                     </a>
-                                    <a href="#" class="portfolio-link" aria-label="View Code">
+                                    <a href="#project-chat-code" class="portfolio-link" data-project-action="code" aria-label="View Code">
                                         <i class='bx bxl-github'></i>
                                     </a>
                                 </div>
@@ -531,18 +530,18 @@
                     </div>
                 </div>
                 
-                <div class="portfolio-item" data-category="mobile">
+                <div class="portfolio-item" data-category="mobile" data-project="recipe">
                     <div class="portfolio-image">
-                        <img src="[via.placeholder.com](https://via.placeholder.com/600x400/e94560/ffffff?text=Project+6)" alt="Project 6">
+                        <img src="https://via.placeholder.com/600x400/e94560/ffffff?text=Project+6" alt="Project 6">
                         <div class="portfolio-overlay">
                             <div class="portfolio-info">
                                 <h3>Recipe Finder App</h3>
                                 <p>AI-powered recipe suggestions</p>
                                 <div class="portfolio-links">
-                                    <a href="#" class="portfolio-link" aria-label="View Live">
+                                    <a href="#project-recipe" class="portfolio-link" data-project-action="demo" aria-label="View Live">
                                         <i class='bx bx-link-external'></i>
                                     </a>
-                                    <a href="#" class="portfolio-link" aria-label="View Code">
+                                    <a href="#project-recipe-code" class="portfolio-link" data-project-action="code" aria-label="View Code">
                                         <i class='bx bxl-github'></i>
                                     </a>
                                 </div>
@@ -606,16 +605,16 @@
                     </div>
                     
                     <div class="contact-social">
-                        <a href="[github.com](https://github.com/yourusername)" target="_blank" aria-label="GitHub">
+                        <a href="https://github.com/yourusername" target="_blank" rel="noopener noreferrer" aria-label="GitHub">
                             <i class='bx bxl-github'></i>
                         </a>
-                        <a href="[linkedin.com](https://linkedin.com/in/yourusername)" target="_blank" aria-label="LinkedIn">
+                        <a href="https://linkedin.com/in/yourusername" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
                             <i class='bx bxl-linkedin'></i>
                         </a>
-                        <a href="[youtube.com](https://youtube.com/@yourusername)" target="_blank" aria-label="YouTube">
+                        <a href="https://youtube.com/@yourusername" target="_blank" rel="noopener noreferrer" aria-label="YouTube">
                             <i class='bx bxl-youtube'></i>
                         </a>
-                        <a href="[twitter.com](https://twitter.com/yourusername)" target="_blank" aria-label="Twitter">
+                        <a href="https://twitter.com/yourusername" target="_blank" rel="noopener noreferrer" aria-label="Twitter">
                             <i class='bx bxl-twitter'></i>
                         </a>
                     </div>
@@ -661,15 +660,36 @@
                 </form>
             </div>
         </section>
+            </div>
+        </div>
     </main>
+
+    <div class="project-panel" id="project-panel" aria-hidden="true">
+        <div class="project-panel-content" role="dialog" aria-modal="true" aria-labelledby="project-panel-title">
+            <button type="button" class="project-panel-close" data-project-close aria-label="Close project details">
+                <i class='bx bx-x'></i>
+            </button>
+            <span class="project-panel-kicker" id="project-panel-kicker">Project</span>
+            <h3 id="project-panel-title">Project Title</h3>
+            <p id="project-panel-description"></p>
+            <div class="project-panel-meta" id="project-panel-meta"></div>
+            <div class="project-panel-actions">
+                <button type="button" class="btn btn-primary" data-project-primary>
+                    <i class='bx bx-link-external'></i>
+                    Open Demo
+                </button>
+                <button type="button" class="btn btn-outline" data-project-secondary>
+                    <i class='bx bxl-github'></i>
+                    View Code
+                </button>
+            </div>
+        </div>
+    </div>
     
     <!-- Scroll to Top Button -->
-    <button class="scroll-top" id="scroll-top" aria-label="Scroll to top">
+    <button type="button" class="scroll-top" id="scroll-top" aria-label="Scroll to top">
         <i class='bx bx-up-arrow-alt'></i>
     </button>
-    
-    <!-- Three.js -->
-    <script src="[cdnjs.cloudflare.com](https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js)"></script>
     
     <!-- Custom JS -->
     <script src="js/main.js"></script>

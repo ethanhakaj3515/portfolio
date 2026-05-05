@@ -2,279 +2,98 @@
 // Global References
 // ============================================
 let cubeBrowser = null;
+let resumeTabs = null;
+let portfolioFilter = null;
+let portfolioProjects = null;
 
 // ============================================
-// Three.js 3D Cube Browser
+// CSS 3D Website Cube
 // ============================================
 class CubeBrowser {
     constructor() {
-        this.canvas = document.getElementById('bg-canvas');
-        this.scene = new THREE.Scene();
-        this.camera = new THREE.PerspectiveCamera(
-            75, 
-            window.innerWidth / window.innerHeight, 
-            0.1, 
-            2000
-        );
-        this.renderer = new THREE.WebGLRenderer({ 
-            canvas: this.canvas, 
-            antialias: true, 
-            alpha: true 
-        });
-        
-        this.mouse = { x: 0, y: 0 };
-        this.targetRotation = { x: 0, y: 0 };
-        this.targetSectionRotation = null;
-        this.isRotatingToSection = false;
-        this.currentSection = 'home';
+        this.cube = document.getElementById('site-cube');
         this.sections = ['home', 'about', 'resume', 'portfolio', 'contact'];
-        this.cubeFaces = {};
-        this.mainCube = null;
-        
+        this.currentSection = 'home';
+        this.rotations = {
+            home: 'rotateX(0deg) rotateY(0deg)',
+            about: 'rotateX(0deg) rotateY(-90deg)',
+            resume: 'rotateX(-90deg) rotateY(0deg)',
+            portfolio: 'rotateX(90deg) rotateY(0deg)',
+            contact: 'rotateX(0deg) rotateY(90deg)'
+        };
+
         this.init();
     }
-    
+
     init() {
-        // Renderer setup
-        this.renderer.setSize(window.innerWidth, window.innerHeight);
-        this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-        this.renderer.setClearColor(0x0a0a0f, 1);
-        
-        // Camera position
-        this.camera.position.z = 100;
-        
-        // Create the main cube
-        this.createCube();
-        this.createLights();
-        
-        // Events
+        const initialSection = window.location.hash.replace('#', '');
+        if (this.rotations[initialSection]) {
+            this.currentSection = initialSection;
+        }
+
         this.bindEvents();
-        
-        // Start animation
-        this.animate();
+        this.rotateToSection(this.currentSection, true);
     }
-    
-    createCube() {
-        const size = 150;
-        const geometry = new THREE.BoxGeometry(size, size, size);
-        
-        // Create materials for each face with distinct colors
-        const materials = [
-            new THREE.MeshPhongMaterial({ color: 0x6c63ff }), // right - about
-            new THREE.MeshPhongMaterial({ color: 0x5a52d9 }), // left - contact
-            new THREE.MeshPhongMaterial({ color: 0x8b85ff }), // top - resume
-            new THREE.MeshPhongMaterial({ color: 0x6c63ff }), // bottom - portfolio
-            new THREE.MeshPhongMaterial({ color: 0x6c63ff }), // front - home
-            new THREE.MeshPhongMaterial({ color: 0x4a3f8f })  // back - hidden
-        ];
-        
-        this.mainCube = new THREE.Mesh(geometry, materials);
-        this.scene.add(this.mainCube);
-        
-        // Add wireframe edges for visual effect
-        const edges = new THREE.EdgesGeometry(geometry);
-        const wireframe = new THREE.LineSegments(
-            edges,
-            new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.1 })
-        );
-        this.mainCube.add(wireframe);
-        
-        // Add content to each face using canvas textures
-        this.createFaceTextures();
-    }
-    
-    createFaceTextures() {
-        // Map sections to face indices
-        const faceMap = {
-            'home': 4,      // front
-            'about': 0,     // right
-            'resume': 2,    // top
-            'portfolio': 3, // bottom
-            'contact': 1    // left
-        };
-        
-        // Create canvas textures for each section
-        Object.entries(faceMap).forEach(([section, faceIndex]) => {
-            const canvas = document.createElement('canvas');
-            canvas.width = 1024;
-            canvas.height = 1024;
-            
-            const ctx = canvas.getContext('2d');
-            
-            // Background
-            ctx.fillStyle = '#0a0a0f';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-            
-            // Border
-            ctx.strokeStyle = '#6c63ff';
-            ctx.lineWidth = 4;
-            ctx.strokeRect(20, 20, canvas.width - 40, canvas.height - 40);
-            
-            // Content
-            this.drawSectionContent(ctx, section, canvas.width, canvas.height);
-            
-            // Create texture
-            const texture = new THREE.CanvasTexture(canvas);
-            texture.magFilter = THREE.NearestFilter;
-            
-            // Apply to face
-            const material = new THREE.MeshPhongMaterial({ 
-                map: texture,
-                color: 0xffffff
-            });
-            
-            this.mainCube.material[faceIndex] = material;
-        });
-    }
-    
-    drawSectionContent(ctx, section, width, height) {
-        ctx.fillStyle = '#e4e4e7';
-        ctx.font = 'bold 48px "Lato", sans-serif';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        
-        let title = '';
-        let subtitle = '';
-        let details = [];
-        
-        switch(section) {
-            case 'home':
-                title = 'Your Name';
-                subtitle = 'Full Stack Developer';
-                details = ['Building Digital', 'Experiences', 'Click to Navigate'];
-                break;
-            case 'about':
-                title = 'About Me';
-                subtitle = 'Let\'s Get to Know';
-                details = ['5+ Years Experience', 'Full Stack Developer', 'Problem Solver'];
-                break;
-            case 'resume':
-                title = 'Resume';
-                subtitle = 'Professional Journey';
-                details = ['Experience', 'Skills', 'Education'];
-                break;
-            case 'portfolio':
-                title = 'Portfolio';
-                subtitle = 'Recent Projects';
-                details = ['E-Commerce', 'Mobile Apps', 'Dashboards'];
-                break;
-            case 'contact':
-                title = 'Contact';
-                subtitle = 'Let\'s Connect';
-                details = ['Get in Touch', 'Discuss Projects', 'Build Together'];
-                break;
-        }
-        
-        // Title
-        ctx.fillStyle = '#e4e4e7';
-        ctx.font = 'bold 60px "Lato", sans-serif';
-        ctx.fillText(title, width / 2, height / 2 - 150);
-        
-        // Subtitle
-        ctx.fillStyle = '#9ca3af';
-        ctx.font = '32px "Lato", sans-serif';
-        ctx.fillText(subtitle, width / 2, height / 2 - 50);
-        
-        // Details
-        ctx.fillStyle = '#6c63ff';
-        ctx.font = '28px "Lato", sans-serif';
-        details.forEach((detail, i) => {
-            ctx.fillText(detail, width / 2, height / 2 + 80 + i * 80);
-        });
-        
-        // Instructions
-        ctx.fillStyle = '#6c63ff';
-        ctx.font = '20px "Lato", sans-serif';
-        ctx.fillText('Use navigation to rotate', width / 2, height - 100);
-    }
-    
-    createLights() {
-        const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
-        this.scene.add(ambientLight);
-        
-        const pointLight = new THREE.PointLight(0x6c63ff, 1, 1000);
-        pointLight.position.set(150, 150, 150);
-        this.scene.add(pointLight);
-        
-        const pointLight2 = new THREE.PointLight(0xff6584, 0.5, 1000);
-        pointLight2.position.set(-150, -150, 150);
-        this.scene.add(pointLight2);
-    }
-    
+
     bindEvents() {
-        window.addEventListener('resize', () => this.onResize());
-        document.addEventListener('mousemove', (e) => this.onMouseMove(e));
-        document.addEventListener('keydown', (e) => this.onKeyPress(e));
+        document.addEventListener('keydown', (event) => this.onKeyPress(event));
     }
-    
-    onResize() {
-        this.camera.aspect = window.innerWidth / window.innerHeight;
-        this.camera.updateProjectionMatrix();
-        this.renderer.setSize(window.innerWidth, window.innerHeight);
-    }
-    
-    onMouseMove(event) {
-        if (!this.isRotatingToSection) {
-            this.mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-            this.mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
-        }
-    }
-    
+
     onKeyPress(event) {
+        const editableElement = ['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName);
+        if (editableElement) return;
+
         const currentIndex = this.sections.indexOf(this.currentSection);
-        
-        if (event.key === 'ArrowRight' || event.key === 'ArrowUp') {
+
+        if (event.key === 'ArrowRight' || event.key === 'ArrowDown') {
+            event.preventDefault();
             const nextIndex = (currentIndex + 1) % this.sections.length;
             this.rotateToSection(this.sections[nextIndex]);
-        } else if (event.key === 'ArrowLeft' || event.key === 'ArrowDown') {
+        } else if (event.key === 'ArrowLeft' || event.key === 'ArrowUp') {
+            event.preventDefault();
             const prevIndex = (currentIndex - 1 + this.sections.length) % this.sections.length;
             this.rotateToSection(this.sections[prevIndex]);
         }
     }
-    
-    rotateToSection(sectionId) {
-        const rotations = {
-            'home': { x: 0, y: 0 },
-            'about': { x: 0, y: -Math.PI / 2 },
-            'resume': { x: Math.PI / 2, y: 0 },
-            'portfolio': { x: -Math.PI / 2, y: 0 },
-            'contact': { x: 0, y: Math.PI / 2 }
-        };
-        
-        if (rotations[sectionId]) {
-            this.currentSection = sectionId;
-            this.targetSectionRotation = rotations[sectionId];
-            this.isRotatingToSection = true;
+
+    rotateToSection(sectionId, immediate = false) {
+        if (!this.cube || !this.rotations[sectionId]) return;
+
+        this.currentSection = sectionId;
+        this.cube.classList.toggle('is-transitioning', !immediate);
+
+        if (immediate) {
+            this.cube.style.transition = 'none';
         }
-    }
-    
-    animate() {
-        requestAnimationFrame(() => this.animate());
-        
-        if (this.isRotatingToSection && this.targetSectionRotation) {
-            // Smoothly interpolate to section rotation
-            this.targetRotation.x += (this.targetSectionRotation.x - this.targetRotation.x) * 0.08;
-            this.targetRotation.y += (this.targetSectionRotation.y - this.targetRotation.y) * 0.08;
-            
-            // Check if rotation is close enough
-            const tolerance = 0.01;
-            if (Math.abs(this.targetRotation.x - this.targetSectionRotation.x) < tolerance &&
-                Math.abs(this.targetRotation.y - this.targetSectionRotation.y) < tolerance) {
-                this.isRotatingToSection = false;
-                this.targetRotation.x = this.targetSectionRotation.x;
-                this.targetRotation.y = this.targetSectionRotation.y;
-                this.targetSectionRotation = null;
+
+        this.cube.style.transform = `translateZ(calc(var(--cube-depth) * -1)) ${this.rotations[sectionId]}`;
+
+        document.querySelectorAll('.section').forEach(section => {
+            const isActive = section.id === sectionId;
+            section.classList.toggle('active', isActive);
+            section.setAttribute('aria-hidden', String(!isActive));
+            if (isActive) {
+                section.scrollTop = 0;
             }
-        } else if (!this.isRotatingToSection) {
-            // Gentle mouse-based rotation when not animating
-            this.targetRotation.x += (this.mouse.y * 0.3 - this.targetRotation.x) * 0.05;
-            this.targetRotation.y += (this.mouse.x * 0.3 - this.targetRotation.y) * 0.05;
+        });
+
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.classList.toggle('active', link.getAttribute('data-section') === sectionId);
+        });
+
+        document.getElementById('scroll-top')?.classList.remove('visible');
+        document.dispatchEvent(new CustomEvent('sectionchange', { detail: { sectionId } }));
+        window.history.replaceState(null, '', `#${sectionId}`);
+
+        if (immediate) {
+            requestAnimationFrame(() => {
+                this.cube.style.transition = '';
+            });
+        } else {
+            window.setTimeout(() => {
+                this.cube.classList.remove('is-transitioning');
+            }, 950);
         }
-        
-        this.mainCube.rotation.x = this.targetRotation.x;
-        this.mainCube.rotation.y = this.targetRotation.y;
-        
-        this.renderer.render(this.scene, this.camera);
     }
 }
 
@@ -385,6 +204,7 @@ class ResumeTabs {
     constructor() {
         this.tabs = document.querySelectorAll('.tab-btn');
         this.contents = document.querySelectorAll('.tab-content');
+        this.transitionTimer = null;
         
         this.init();
     }
@@ -392,28 +212,88 @@ class ResumeTabs {
     init() {
         this.tabs.forEach(tab => {
             tab.addEventListener('click', () => this.switchTab(tab));
+            tab.addEventListener('keydown', (event) => this.handleKeydown(event, tab));
         });
+
+        const initialTab = new URLSearchParams(window.location.search).get('resumeTab');
+        const targetTab = document.querySelector(`.tab-btn[data-tab="${initialTab}"]`);
+        if (targetTab) {
+            this.switchTab(targetTab, true);
+        }
     }
     
-    switchTab(tab) {
+    switchTab(tab, skipHistory = false) {
         const targetId = tab.getAttribute('data-tab');
+        const activeContent = document.querySelector('.tab-content.active');
+        const nextContent = document.getElementById(targetId);
+
+        if (!nextContent || activeContent === nextContent) return;
         
         // Update tabs
-        this.tabs.forEach(t => t.classList.remove('active'));
-        tab.classList.add('active');
-        
-        // Update content
-        this.contents.forEach(content => {
-            content.classList.remove('active');
-            if (content.id === targetId) {
-                content.classList.add('active');
-                
-                // Animate skill bars if skills tab
-                if (targetId === 'skills') {
-                    this.animateSkillBars();
-                }
-            }
+        this.tabs.forEach(t => {
+            t.classList.remove('active');
+            t.setAttribute('aria-selected', 'false');
         });
+        tab.classList.add('active');
+        tab.setAttribute('aria-selected', 'true');
+
+        window.clearTimeout(this.transitionTimer);
+        activeContent?.classList.add('is-leaving');
+
+        this.transitionTimer = window.setTimeout(() => {
+            this.contents.forEach(content => {
+                content.classList.remove('active', 'is-leaving');
+            });
+
+            nextContent.classList.add('active');
+
+            if (targetId === 'skills') {
+                this.animateSkillBars();
+            }
+
+            this.scrollResumeToPanels();
+            document.dispatchEvent(new CustomEvent('scrollcontentchange'));
+        }, activeContent ? 220 : 0);
+
+        if (!skipHistory) {
+            const url = new URL(window.location.href);
+            url.hash = 'resume';
+            url.searchParams.set('resumeTab', targetId);
+            window.history.replaceState(null, '', url);
+        }
+    }
+
+    scrollResumeToPanels() {
+        const resumeSection = document.getElementById('resume');
+        const tabs = document.querySelector('.resume-tabs');
+        if (!resumeSection || !tabs) return;
+
+        resumeSection.scrollTo({
+            top: Math.max(tabs.offsetTop - 20, 0),
+            behavior: 'smooth'
+        });
+    }
+
+    handleKeydown(event, tab) {
+        if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
+
+        event.preventDefault();
+        const tabs = Array.from(this.tabs);
+        const currentIndex = tabs.indexOf(tab);
+        let nextIndex = currentIndex;
+
+        if (event.key === 'ArrowRight') {
+            nextIndex = (currentIndex + 1) % tabs.length;
+        } else if (event.key === 'ArrowLeft') {
+            nextIndex = (currentIndex - 1 + tabs.length) % tabs.length;
+        } else if (event.key === 'Home') {
+            nextIndex = 0;
+        } else if (event.key === 'End') {
+            nextIndex = tabs.length - 1;
+        }
+
+        tabs[nextIndex].focus();
+        this.switchTab(tabs[nextIndex]);
     }
     
     animateSkillBars() {
@@ -443,14 +323,24 @@ class PortfolioFilter {
         this.filterBtns.forEach(btn => {
             btn.addEventListener('click', () => this.filter(btn));
         });
+
+        const initialFilter = new URLSearchParams(window.location.search).get('portfolioFilter');
+        const targetFilter = document.querySelector(`.filter-btn[data-filter="${initialFilter}"]`);
+        if (targetFilter) {
+            this.filter(targetFilter, true);
+        }
     }
     
-    filter(btn) {
+    filter(btn, skipHistory = false) {
         const filter = btn.getAttribute('data-filter');
         
         // Update buttons
-        this.filterBtns.forEach(b => b.classList.remove('active'));
+        this.filterBtns.forEach(b => {
+            b.classList.remove('active');
+            b.setAttribute('aria-pressed', 'false');
+        });
         btn.classList.add('active');
+        btn.setAttribute('aria-pressed', 'true');
         
         // Filter items
         this.items.forEach(item => {
@@ -463,6 +353,206 @@ class PortfolioFilter {
                 item.classList.add('hidden');
             }
         });
+
+        if (!skipHistory) {
+            const url = new URL(window.location.href);
+            url.hash = 'portfolio';
+            url.searchParams.set('portfolioFilter', filter);
+            window.history.replaceState(null, '', url);
+        }
+
+        document.dispatchEvent(new CustomEvent('scrollcontentchange'));
+    }
+}
+
+// ============================================
+// Portfolio Project Panel
+// ============================================
+class PortfolioProjects {
+    constructor() {
+        this.panel = document.getElementById('project-panel');
+        this.title = document.getElementById('project-panel-title');
+        this.kicker = document.getElementById('project-panel-kicker');
+        this.description = document.getElementById('project-panel-description');
+        this.meta = document.getElementById('project-panel-meta');
+        this.primaryAction = document.querySelector('[data-project-primary]');
+        this.secondaryAction = document.querySelector('[data-project-secondary]');
+        this.closeButton = document.querySelector('[data-project-close]');
+        this.activeTrigger = null;
+        this.activeProject = null;
+        this.projects = {
+            ecommerce: {
+                title: 'E-Commerce Platform',
+                type: 'Web App',
+                description: 'A full-stack storefront with product browsing, cart flows, checkout states, and admin-ready product structure.',
+                tags: ['React', 'Node.js', 'MongoDB'],
+                demo: 'https://example.com/e-commerce-platform',
+                code: 'https://github.com/yourusername/e-commerce-platform'
+            },
+            fitness: {
+                title: 'Fitness Tracker App',
+                type: 'Mobile App',
+                description: 'A cross-platform workout tracker for goals, progress history, and Firebase-backed user data.',
+                tags: ['React Native', 'Firebase'],
+                demo: 'https://example.com/fitness-tracker-app',
+                code: 'https://github.com/yourusername/fitness-tracker-app'
+            },
+            tasks: {
+                title: 'Task Management Dashboard',
+                type: 'Web App',
+                description: 'A productivity dashboard with project views, task states, team-oriented filtering, and reporting-ready data.',
+                tags: ['Vue.js', 'Express', 'PostgreSQL'],
+                demo: 'https://example.com/task-management-dashboard',
+                code: 'https://github.com/yourusername/task-management-dashboard'
+            },
+            brand: {
+                title: 'Brand Identity System',
+                type: 'Design',
+                description: 'A cohesive identity package covering color, typography, component rules, and reusable visual assets.',
+                tags: ['Figma', 'Illustrator'],
+                demo: 'https://example.com/brand-identity-system',
+                code: 'https://example.com/brand-identity-system/details'
+            },
+            chat: {
+                title: 'Real-time Chat Application',
+                type: 'Web App',
+                description: 'A WebSocket-based chat experience with live messaging, presence states, and scalable session handling.',
+                tags: ['Socket.io', 'React', 'Redis'],
+                demo: 'https://example.com/realtime-chat-application',
+                code: 'https://github.com/yourusername/realtime-chat-application'
+            },
+            recipe: {
+                title: 'Recipe Finder App',
+                type: 'Mobile App',
+                description: 'An AI-assisted recipe finder that turns preferences and ingredients into practical cooking suggestions.',
+                tags: ['Flutter', 'Python', 'TensorFlow'],
+                demo: 'https://example.com/recipe-finder-app',
+                code: 'https://github.com/yourusername/recipe-finder-app'
+            }
+        };
+
+        this.init();
+    }
+
+    init() {
+        if (!this.panel) return;
+
+        document.querySelectorAll('[data-project-action]').forEach(link => {
+            link.addEventListener('click', (event) => this.openFromLink(event, link));
+        });
+
+        this.closeButton?.addEventListener('click', () => this.close());
+        this.panel.addEventListener('click', (event) => {
+            if (event.target === this.panel) {
+                this.close();
+            }
+        });
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape' && this.panel.classList.contains('active')) {
+                this.close();
+            }
+        });
+    }
+
+    openFromLink(event, link) {
+        event.preventDefault();
+
+        const item = link.closest('.portfolio-item');
+        const project = this.projects[item?.dataset.project];
+        if (!project) return;
+
+        this.activeTrigger = link;
+        this.open(project, link.dataset.projectAction);
+    }
+
+    open(project, action) {
+        this.activeProject = project;
+        this.kicker.textContent = action === 'code' ? 'Code Overview' : project.type;
+        this.title.textContent = project.title;
+        this.description.textContent = project.description;
+        this.meta.innerHTML = project.tags.map(tag => `<span>${tag}</span>`).join('');
+
+        this.primaryAction.onclick = () => this.showActionResult('demo');
+        this.secondaryAction.onclick = () => this.showActionResult(action === 'details' ? 'details' : 'code');
+
+        this.primaryAction.innerHTML = '<i class="bx bx-link-external"></i>Open Demo';
+        this.secondaryAction.innerHTML = action === 'details'
+            ? '<i class="bx bx-show"></i>View Details'
+            : '<i class="bx bxl-github"></i>View Code';
+
+        this.panel.classList.add('active');
+        this.panel.setAttribute('aria-hidden', 'false');
+        this.closeButton?.focus();
+    }
+
+    showActionResult(action) {
+        if (!this.activeProject) return;
+
+        const actionLabels = {
+            demo: 'Demo Preview',
+            code: 'Code Summary',
+            details: 'Design Details'
+        };
+
+        this.kicker.textContent = actionLabels[action];
+        this.description.textContent = action === 'demo'
+            ? `Demo action is ready for ${this.activeProject.title}. Replace the project URL in js/main.js when you have a live deployment.`
+            : `This action is ready for ${this.activeProject.title}. Replace the repository/detail URL in js/main.js when you have the final link.`;
+
+        this.meta.innerHTML = [
+            ...this.activeProject.tags,
+            action === 'demo' ? this.activeProject.demo : this.activeProject.code
+        ].map(tag => `<span>${tag}</span>`).join('');
+    }
+
+    close() {
+        this.panel.classList.remove('active');
+        this.panel.setAttribute('aria-hidden', 'true');
+        this.activeTrigger?.focus();
+    }
+}
+
+// ============================================
+// Resume Download
+// ============================================
+class ResumeDownload {
+    constructor() {
+        this.button = document.querySelector('[data-download-resume]');
+
+        this.init();
+    }
+
+    init() {
+        if (!this.button) return;
+
+        this.button.addEventListener('click', (event) => this.downloadResume(event));
+    }
+
+    downloadResume(event) {
+        event.preventDefault();
+
+        const resumeSection = document.getElementById('resume');
+        const aboutSection = document.getElementById('about');
+        const resumeText = [
+            document.querySelector('.glitch')?.textContent?.trim() || 'Your Name',
+            '',
+            'ABOUT',
+            aboutSection?.innerText?.trim() || '',
+            '',
+            'RESUME',
+            resumeSection?.innerText?.trim() || ''
+        ].join('\n');
+
+        const blob = new Blob([resumeText], { type: 'text/plain' });
+        const url = URL.createObjectURL(blob);
+        const downloadLink = document.createElement('a');
+
+        downloadLink.href = url;
+        downloadLink.download = 'resume.txt';
+        document.body.appendChild(downloadLink);
+        downloadLink.click();
+        downloadLink.remove();
+        URL.revokeObjectURL(url);
     }
 }
 
@@ -485,11 +575,13 @@ class ContactForm {
         
         const formData = new FormData(this.form);
         const data = Object.fromEntries(formData);
-        
-        // Here you would typically send the data to a server
-        console.log('Form submitted:', data);
-        
-        // Show success message (you can customize this)
+        const subject = encodeURIComponent(data.subject || 'Portfolio inquiry');
+        const body = encodeURIComponent(
+            `Name: ${data.name}\nEmail: ${data.email}\nPhone: ${data.phone || 'Not provided'}\n\n${data.message}`
+        );
+
+        window.location.href = `mailto:your.email@example.com?subject=${subject}&body=${body}`;
+
         const btn = this.form.querySelector('.btn-submit');
         const originalText = btn.innerHTML;
         
@@ -510,17 +602,35 @@ class ContactForm {
 class ScrollToTop {
     constructor() {
         this.button = document.getElementById('scroll-top');
+        this.sections = document.querySelectorAll('.section');
         
         this.init();
     }
     
     init() {
-        window.addEventListener('scroll', () => this.toggleVisibility());
+        if (!this.button) return;
+
+        this.sections.forEach(section => {
+            section.addEventListener('scroll', () => this.updateVisibility(), { passive: true });
+        });
+
+        document.addEventListener('sectionchange', () => this.updateVisibility());
+        document.addEventListener('scrollcontentchange', () => this.updateVisibility());
+        window.addEventListener('resize', () => this.updateVisibility());
         this.button.addEventListener('click', () => this.scrollToTop());
+
+        this.updateVisibility();
     }
     
-    toggleVisibility() {
-        if (window.scrollY > 300) {
+    getActiveSection() {
+        return document.querySelector('.section.active');
+    }
+
+    updateVisibility() {
+        const section = this.getActiveSection();
+        const canScroll = section && section.scrollHeight > section.clientHeight + 1;
+
+        if (canScroll && section.scrollTop > 80) {
             this.button.classList.add('visible');
         } else {
             this.button.classList.remove('visible');
@@ -528,7 +638,87 @@ class ScrollToTop {
     }
     
     scrollToTop() {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+        const section = this.getActiveSection();
+        if (!section) return;
+
+        section.scrollTo({ top: 0, behavior: 'smooth' });
+        requestAnimationFrame(() => this.updateVisibility());
+    }
+}
+
+// ============================================
+// Button Action Fallbacks
+// ============================================
+class ButtonActions {
+    constructor() {
+        this.init();
+    }
+
+    init() {
+        document.addEventListener('click', (event) => this.handleClick(event), true);
+    }
+
+    handleClick(event) {
+        const target = event.target.closest('a, button');
+        if (!target) return;
+
+        if (target.matches('[data-download-resume]')) {
+            return;
+        }
+
+        if (target.matches('.nav-link')) {
+            event.preventDefault();
+            event.stopImmediatePropagation();
+            cubeBrowser?.rotateToSection(target.dataset.section);
+            document.querySelector('.navbar')?.classList.remove('active');
+            return;
+        }
+
+        if (target.matches('[data-section-target]')) {
+            event.preventDefault();
+            event.stopImmediatePropagation();
+            cubeBrowser?.rotateToSection(target.dataset.sectionTarget);
+            document.querySelector('.navbar')?.classList.remove('active');
+            return;
+        }
+
+        if (target.matches('a[href^="#"]')) {
+            const sectionId = target.getAttribute('href').slice(1);
+            if (cubeBrowser?.rotations?.[sectionId]) {
+                event.preventDefault();
+                event.stopImmediatePropagation();
+                cubeBrowser.rotateToSection(sectionId);
+                return;
+            }
+        }
+
+        if (target.matches('.tab-btn')) {
+            event.preventDefault();
+            event.stopImmediatePropagation();
+            resumeTabs?.switchTab(target);
+            return;
+        }
+
+        if (target.matches('.filter-btn')) {
+            event.preventDefault();
+            event.stopImmediatePropagation();
+            portfolioFilter?.filter(target);
+            return;
+        }
+
+        if (target.matches('[data-project-action]')) {
+            event.preventDefault();
+            event.stopImmediatePropagation();
+            portfolioProjects?.openFromLink(event, target);
+            return;
+        }
+
+        if (target.matches('[data-project-close]')) {
+            event.preventDefault();
+            event.stopImmediatePropagation();
+            portfolioProjects?.close();
+            return;
+        }
     }
 }
 
@@ -536,8 +726,8 @@ class ScrollToTop {
 // Initialize Everything
 // ============================================
 document.addEventListener('DOMContentLoaded', () => {
-    // Initialize Three.js background
-    cubeBackground = new CubeBackground();
+    cubeBrowser = new CubeBrowser();
+    new ButtonActions();
     
     // Initialize navigation
     new Navigation();
@@ -554,10 +744,16 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     // Initialize resume tabs
-    new ResumeTabs();
+    resumeTabs = new ResumeTabs();
     
     // Initialize portfolio filter
-    new PortfolioFilter();
+    portfolioFilter = new PortfolioFilter();
+
+    // Initialize portfolio project buttons
+    portfolioProjects = new PortfolioProjects();
+
+    // Initialize resume download
+    new ResumeDownload();
     
     // Initialize contact form
     new ContactForm();
@@ -568,6 +764,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // Handle internal links with data-section
     document.querySelectorAll('a[href^="#"]').forEach(link => {
         link.addEventListener('click', (e) => {
+            if (e.defaultPrevented) return;
+
             const href = link.getAttribute('href');
             if (href.startsWith('#') && href.length > 1) {
                 const sectionId = href.substring(1);
@@ -579,4 +777,9 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     });
+
+    const initialSection = window.location.hash.replace('#', '');
+    if (initialSection) {
+        cubeBrowser.rotateToSection(initialSection, true);
+    }
 });
