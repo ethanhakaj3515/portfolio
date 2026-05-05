@@ -628,11 +628,14 @@ class ResumeDownload {
 class ContactForm {
     constructor() {
         this.form = document.getElementById('contact-form');
+        this.recipient = 'ethanhakaj@gmail.com';
         
         this.init();
     }
     
     init() {
+        if (!this.form) return;
+
         this.form.addEventListener('submit', (e) => this.handleSubmit(e));
     }
     
@@ -646,7 +649,7 @@ class ContactForm {
             `Name: ${data.name}\nEmail: ${data.email}\nPhone: ${data.phone || 'Not provided'}\n\n${data.message}`
         );
 
-        window.location.href = `mailto:your.email@example.com?subject=${subject}&body=${body}`;
+        window.location.href = `mailto:${this.recipient}?subject=${subject}&body=${body}`;
 
         const btn = this.form.querySelector('.btn-submit');
         const originalText = btn.innerHTML;
