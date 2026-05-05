@@ -36,23 +36,23 @@ class CubeBrowser {
     }
 
     bindEvents() {
-        document.addEventListener('keydown', (event) => this.onKeyPress(event));
+        const cubeScene = document.querySelector('.cube-scene');
+        if (cubeScene) {
+            cubeScene.addEventListener('wheel', (event) => this.onWheel(event), { passive: false });
+        }
     }
 
-    onKeyPress(event) {
-        const editableElement = ['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName);
-        if (editableElement) return;
+    onWheel(event) {
+        const activeSection = document.querySelector('.section.active');
+        if (!activeSection) return;
 
-        const currentIndex = this.sections.indexOf(this.currentSection);
+        const deltaY = event.deltaY;
+        const canScrollUp = activeSection.scrollTop > 0;
+        const canScrollDown = activeSection.scrollTop + activeSection.clientHeight < activeSection.scrollHeight;
 
-        if (event.key === 'ArrowRight' || event.key === 'ArrowDown') {
+        if ((deltaY > 0 && canScrollDown) || (deltaY < 0 && canScrollUp)) {
             event.preventDefault();
-            const nextIndex = (currentIndex + 1) % this.sections.length;
-            this.rotateToSection(this.sections[nextIndex]);
-        } else if (event.key === 'ArrowLeft' || event.key === 'ArrowUp') {
-            event.preventDefault();
-            const prevIndex = (currentIndex - 1 + this.sections.length) % this.sections.length;
-            this.rotateToSection(this.sections[prevIndex]);
+            activeSection.scrollTop += deltaY;
         }
     }
 
