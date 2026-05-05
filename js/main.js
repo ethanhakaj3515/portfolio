@@ -124,6 +124,7 @@ class Navigation {
         document.addEventListener('click', (e) => {
             if (!this.navbar.contains(e.target) && !this.menuToggle.contains(e.target)) {
                 this.navbar.classList.remove('active');
+                this.menuToggle.setAttribute('aria-expanded', 'false');
             }
         });
     }
@@ -144,10 +145,12 @@ class Navigation {
         
         // Close mobile menu
         this.navbar.classList.remove('active');
+        this.menuToggle.setAttribute('aria-expanded', 'false');
     }
     
     toggleMobileMenu() {
         this.navbar.classList.toggle('active');
+        this.menuToggle.setAttribute('aria-expanded', String(this.navbar.classList.contains('active')));
     }
 }
 
@@ -380,6 +383,7 @@ class PortfolioProjects {
         this.closeButton = document.querySelector('[data-project-close]');
         this.activeTrigger = null;
         this.activeProject = null;
+        this.activeAction = 'code';
         this.projects = {
             ecommerce: {
                 title: 'E-Commerce Platform',
@@ -467,13 +471,14 @@ class PortfolioProjects {
 
     open(project, action) {
         this.activeProject = project;
+        this.activeAction = action === 'details' ? 'details' : 'code';
         this.kicker.textContent = action === 'code' ? 'Code Overview' : project.type;
         this.title.textContent = project.title;
         this.description.textContent = project.description;
         this.meta.innerHTML = project.tags.map(tag => `<span>${tag}</span>`).join('');
 
         this.primaryAction.onclick = () => this.showActionResult('demo');
-        this.secondaryAction.onclick = () => this.showActionResult(action === 'details' ? 'details' : 'code');
+        this.secondaryAction.onclick = () => this.showActionResult(this.activeAction);
 
         this.primaryAction.innerHTML = '<i class="bx bx-link-external"></i>Open Demo';
         this.secondaryAction.innerHTML = action === 'details'
@@ -488,6 +493,7 @@ class PortfolioProjects {
     showActionResult(action) {
         if (!this.activeProject) return;
 
+        const targetUrl = action === 'demo' ? this.activeProject.demo : this.activeProject.code;
         const actionLabels = {
             demo: 'Demo Preview',
             code: 'Code Summary',
@@ -496,13 +502,15 @@ class PortfolioProjects {
 
         this.kicker.textContent = actionLabels[action];
         this.description.textContent = action === 'demo'
-            ? `Demo action is ready for ${this.activeProject.title}. Replace the project URL in js/main.js when you have a live deployment.`
-            : `This action is ready for ${this.activeProject.title}. Replace the repository/detail URL in js/main.js when you have the final link.`;
+            ? `Opening the demo for ${this.activeProject.title}.`
+            : `Opening the ${action === 'details' ? 'details page' : 'code repository'} for ${this.activeProject.title}.`;
 
         this.meta.innerHTML = [
             ...this.activeProject.tags,
-            action === 'demo' ? this.activeProject.demo : this.activeProject.code
+            targetUrl
         ].map(tag => `<span>${tag}</span>`).join('');
+
+        window.open(targetUrl, '_blank', 'noopener,noreferrer');
     }
 
     close() {
@@ -666,6 +674,10 @@ class ButtonActions {
             return;
         }
 
+        if (target.matches('#menu-toggle')) {
+            return;
+        }
+
         if (target.matches('.nav-link')) {
             event.preventDefault();
             event.stopImmediatePropagation();
@@ -718,6 +730,19 @@ class ButtonActions {
             event.stopImmediatePropagation();
             portfolioProjects?.close();
             return;
+        }
+
+        if (target.matches('[data-project-primary]')) {
+            event.preventDefault();
+            event.stopImmediatePropagation();
+            portfolioProjects?.showActionResult('demo');
+            return;
+        }
+
+        if (target.matches('[data-project-secondary]')) {
+            event.preventDefault();
+            event.stopImmediatePropagation();
+            portfolioProjects?.showActionResult(portfolioProjects?.activeAction || 'code');
         }
     }
 }
