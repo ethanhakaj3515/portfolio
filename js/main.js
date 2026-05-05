@@ -502,21 +502,75 @@ class PortfolioProjects {
 
         this.kicker.textContent = actionLabels[action];
         this.description.textContent = action === 'demo'
-            ? `Opening the demo for ${this.activeProject.title}.`
-            : `Opening the ${action === 'details' ? 'details page' : 'code repository'} for ${this.activeProject.title}.`;
+            ? `${this.activeProject.title} demo preview is active. Add your deployed URL later to connect this button to a live build.`
+            : `${this.activeProject.title} ${action === 'details' ? 'details' : 'code'} view is active. Add your final URL later to connect this button externally.`;
 
         this.meta.innerHTML = [
             ...this.activeProject.tags,
             targetUrl
         ].map(tag => `<span>${tag}</span>`).join('');
 
-        window.open(targetUrl, '_blank', 'noopener,noreferrer');
     }
 
     close() {
         this.panel.classList.remove('active');
         this.panel.setAttribute('aria-hidden', 'true');
         this.activeTrigger?.focus();
+    }
+}
+
+// ============================================
+// Portfolio Images
+// ============================================
+class PortfolioImages {
+    constructor() {
+        this.colors = {
+            ecommerce: ['#6c63ff', '#43d9ad'],
+            fitness: ['#ff6584', '#6c63ff'],
+            tasks: ['#43d9ad', '#4a90d9'],
+            brand: ['#ffc247', '#ff6584'],
+            chat: ['#4a90d9', '#6c63ff'],
+            recipe: ['#e94560', '#ffc247']
+        };
+
+        this.init();
+    }
+
+    init() {
+        document.querySelectorAll('.portfolio-item').forEach(item => {
+            const image = item.querySelector('img');
+            const title = item.querySelector('.portfolio-info h3')?.textContent || 'Project';
+            const project = item.dataset.project;
+            const colors = this.colors[project] || ['#6c63ff', '#ff6584'];
+
+            if (image) {
+                image.src = this.createProjectImage(title, colors);
+            }
+        });
+    }
+
+    createProjectImage(title, colors) {
+        const [start, end] = colors;
+        const safeTitle = title.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        const svg = `
+            <svg xmlns="http://www.w3.org/2000/svg" width="900" height="600" viewBox="0 0 900 600">
+                <defs>
+                    <linearGradient id="g" x1="0" x2="1" y1="0" y2="1">
+                        <stop offset="0" stop-color="${start}"/>
+                        <stop offset="1" stop-color="${end}"/>
+                    </linearGradient>
+                </defs>
+                <rect width="900" height="600" fill="#111119"/>
+                <rect x="70" y="70" width="760" height="460" rx="28" fill="url(#g)" opacity="0.9"/>
+                <rect x="110" y="120" width="680" height="64" rx="14" fill="rgba(255,255,255,0.2)"/>
+                <rect x="110" y="220" width="300" height="210" rx="18" fill="rgba(255,255,255,0.2)"/>
+                <rect x="450" y="220" width="340" height="38" rx="10" fill="rgba(255,255,255,0.26)"/>
+                <rect x="450" y="286" width="280" height="32" rx="10" fill="rgba(255,255,255,0.2)"/>
+                <rect x="450" y="344" width="310" height="32" rx="10" fill="rgba(255,255,255,0.2)"/>
+                <text x="450" y="505" text-anchor="middle" font-family="Lato, Arial, sans-serif" font-size="42" font-weight="700" fill="#ffffff">${safeTitle}</text>
+            </svg>`;
+
+        return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
     }
 }
 
@@ -776,6 +830,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Initialize portfolio project buttons
     portfolioProjects = new PortfolioProjects();
+
+    // Generate reliable portfolio artwork
+    new PortfolioImages();
 
     // Initialize resume download
     new ResumeDownload();

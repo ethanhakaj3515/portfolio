@@ -981,11 +981,12 @@ textarea {
 .portfolio-overlay {
     position: absolute;
     inset: 0;
-    background: rgba(108, 99, 255, 0.9);
+    padding: 22px;
+    background: linear-gradient(to top, rgba(10, 10, 15, 0.96), rgba(10, 10, 15, 0.22), transparent);
     display: flex;
-    align-items: center;
+    align-items: flex-end;
     justify-content: center;
-    opacity: 0;
+    opacity: 1;
     transition: var(--transition-normal);
 }
 
@@ -995,7 +996,7 @@ textarea {
 
 .portfolio-info {
     text-align: center;
-    transform: translateY(20px);
+    transform: translateY(0);
     transition: transform var(--transition-normal);
 }
 
