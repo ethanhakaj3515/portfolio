@@ -370,6 +370,7 @@ textarea {
 .section.active {
     opacity: 1;
     pointer-events: auto !important;
+    z-index: 2;
     box-shadow: var(--shadow-lg), var(--shadow-glow), inset 0 0 80px rgba(108, 99, 255, 0.08);
 }
 
@@ -1147,6 +1148,7 @@ textarea {
     backdrop-filter: blur(12px);
     opacity: 0;
     visibility: hidden;
+    pointer-events: none;
     transition: var(--transition-normal);
     z-index: 1100;
 }
@@ -1154,6 +1156,7 @@ textarea {
 .project-panel.active {
     opacity: 1;
     visibility: visible;
+    pointer-events: auto;
 }
 
 .project-panel-content {

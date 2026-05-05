@@ -623,21 +623,6 @@ class ResumeDownload {
 }
 
 // ============================================
-// Contact Form
-// ============================================
-class ContactForm {
-    constructor() {
-        this.form = document.getElementById('contact-form');
-        this.init();
-    }
-    
-    init() {
-        if (!this.form) return;
-        this.form.setAttribute('target', '_blank');
-    }
-}
-
-// ============================================
 // Scroll to Top
 // ============================================
 class ScrollToTop {
@@ -815,9 +800,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Initialize resume download
     new ResumeDownload();
-    
-    // Initialize contact form
-    new ContactForm();
     
     // Initialize scroll to top
     new ScrollToTop();
