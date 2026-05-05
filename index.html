@@ -1,35 +1,677 @@
-<section class="section resume">
-    <h2 class="title">Resume</h2>
-
-    <div class="tab-box">
-        <div class="tab-list resume-list active">
-            <h3>Experience</h3>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portfolio | Your Name</title>
+    
+    <!-- Boxicons -->
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    
+    <!-- Google Fonts - Lato -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&display=swap" rel="stylesheet">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- Three.js Background Canvas -->
+    <canvas id="bg-canvas"></canvas>
+    
+    <!-- Navigation -->
+    <header class="header">
+        <a href="#home" class="logo">
+            <span class="logo-text">Portfolio</span>
+        </a>
+        
+        <nav class="navbar" id="navbar">
+            <a href="#home" class="nav-link active" data-section="home">
+                <i class='bx bx-home'></i>
+                <span>Home</span>
+            </a>
+            <a href="#about" class="nav-link" data-section="about">
+                <i class='bx bx-user'></i>
+                <span>About</span>
+            </a>
+            <a href="#resume" class="nav-link" data-section="resume">
+                <i class='bx bx-file'></i>
+                <span>Resume</span>
+            </a>
+            <a href="#portfolio" class="nav-link" data-section="portfolio">
+                <i class='bx bx-briefcase'></i>
+                <span>Portfolio</span>
+            </a>
+            <a href="#contact" class="nav-link" data-section="contact">
+                <i class='bx bx-envelope'></i>
+                <span>Contact</span>
+            </a>
+        </nav>
+        
+        <div class="menu-toggle" id="menu-toggle">
+            <i class='bx bx-menu'></i>
         </div>
-        <div class="tab-list resume-list">
-            <h3>Skills</h3>
-        </div>
-        <div class="tab-list resume-list">
-            <h3>Education</h3>
-        </div>
-    </div>
-
-    <div class="tab-wrapper">
-        <div class="tab-grid resume-box experience active">
-            <div class="tab-item resume-item">
-                <p>experience TEST</p>
+    </header>
+    
+    <!-- Main Content -->
+    <main class="main-content">
+        
+        <!-- Home Section -->
+        <section class="section home active" id="home">
+            <div class="home-container">
+                <div class="home-content">
+                    <h3>Hello, I'm</h3>
+                    <h1 class="glitch" data-text="Your Name">Your Name</h1>
+                    <h2 class="typing-text">
+                        <span class="typed-text"></span>
+                        <span class="cursor">&nbsp;</span>
+                    </h2>
+                    <p class="home-description">
+                        A passionate developer crafting innovative digital experiences. 
+                        I transform ideas into elegant, functional solutions that make a difference.
+                    </p>
+                    
+                    <div class="home-buttons">
+                        <a href="assets/resume.pdf" download class="btn btn-primary">
+                            <i class='bx bx-download'></i>
+                            Download CV
+                        </a>
+                        <a href="#contact" class="btn btn-outline">
+                            <i class='bx bx-conversation'></i>
+                            Let's Talk
+                        </a>
+                    </div>
+                    
+                    <div class="social-links">
+                        <a href="[github.com](https://github.com/yourusername)" target="_blank" class="social-link" aria-label="GitHub">
+                            <i class='bx bxl-github'></i>
+                        </a>
+                        <a href="[linkedin.com](https://linkedin.com/in/yourusername)" target="_blank" class="social-link" aria-label="LinkedIn">
+                            <i class='bx bxl-linkedin'></i>
+                        </a>
+                        <a href="[youtube.com](https://youtube.com/@yourusername)" target="_blank" class="social-link" aria-label="YouTube">
+                            <i class='bx bxl-youtube'></i>
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="home-image">
+                    <div class="image-wrapper">
+                        <div class="image-border"></div>
+                        <img src="assets/profile.jpg" alt="Profile Picture">
+                    </div>
+                </div>
             </div>
-        </div>
-
-        <div class="tab-grid resume-box skills">
-            <div class="tab-item resume-item">
-                <p>skills TEST</p>
+        </section>
+        
+        <!-- About Section -->
+        <section class="section about" id="about">
+            <div class="section-header">
+                <h2 class="section-title">About Me</h2>
+                <p class="section-subtitle">Get to know me better</p>
             </div>
-        </div>
-
-        <div class="tab-grid resume-box education">
-            <div class="tab-item resume-item">
-                <p>education TEST</p>
+            
+            <div class="about-container">
+                <div class="about-image">
+                    <div class="image-wrapper">
+                        <div class="image-border"></div>
+                        <img src="assets/about.jpg" alt="About Me">
+                    </div>
+                </div>
+                
+                <div class="about-content">
+                    <h3>Who Am I?</h3>
+                    <p>
+                        I'm a passionate Full Stack Developer with over 5 years of experience 
+                        in creating beautiful, functional, and user-centered digital experiences. 
+                        I am always looking for new and innovative ways to bring my clients' visions to life.
+                    </p>
+                    <p>
+                        I believe that design is about more than just making things look pretty – 
+                        it's about solving problems and creating intuitive, enjoyable experiences for users. 
+                        Whether I'm working on a website, mobile app, or other digital product, 
+                        I bring my commitment to design excellence and user-centered thinking to every project I work on.
+                    </p>
+                    
+                    <div class="about-info">
+                        <div class="info-item">
+                            <i class='bx bx-user'></i>
+                            <div>
+                                <span class="info-title">Name:</span>
+                                <span class="info-value">Your Name</span>
+                            </div>
+                        </div>
+                        <div class="info-item">
+                            <i class='bx bx-envelope'></i>
+                            <div>
+                                <span class="info-title">Email:</span>
+                                <span class="info-value">your.email@example.com</span>
+                            </div>
+                        </div>
+                        <div class="info-item">
+                            <i class='bx bx-map'></i>
+                            <div>
+                                <span class="info-title">Location:</span>
+                                <span class="info-value">City, Country</span>
+                            </div>
+                        </div>
+                        <div class="info-item">
+                            <i class='bx bx-check-circle'></i>
+                            <div>
+                                <span class="info-title">Availability:</span>
+                                <span class="info-value available">Open to opportunities</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <a href="#resume" class="btn btn-primary">
+                        <i class='bx bx-right-arrow-alt'></i>
+                        View More
+                    </a>
+                </div>
             </div>
-        </div>
-    </div>
-</section>
+        </section>
+        
+        <!-- Resume Section -->
+        <section class="section resume" id="resume">
+            <div class="section-header">
+                <h2 class="section-title">Resume</h2>
+                <p class="section-subtitle">My professional journey</p>
+            </div>
+            
+            <div class="resume-container">
+                <!-- Resume Tabs -->
+                <div class="resume-tabs">
+                    <button class="tab-btn active" data-tab="experience">
+                        <i class='bx bx-briefcase'></i>
+                        Experience
+                    </button>
+                    <button class="tab-btn" data-tab="skills">
+                        <i class='bx bx-code-alt'></i>
+                        Skills
+                    </button>
+                    <button class="tab-btn" data-tab="education">
+                        <i class='bx bx-book'></i>
+                        Education
+                    </button>
+                </div>
+                
+                <!-- Experience Tab -->
+                <div class="tab-content active" id="experience">
+                    <div class="timeline">
+                        <div class="timeline-item">
+                            <div class="timeline-marker"><i class='bx bx-briefcase'></i></div>
+                            <div class="timeline-content">
+                                <span class="timeline-date">2022 - Present</span>
+                                <h3>Senior Full Stack Developer</h3>
+                                <h4>Tech Company Inc.</h4>
+                                <p>
+                                    Led development of multiple high-traffic web applications. 
+                                    Implemented CI/CD pipelines and mentored junior developers. 
+                                    Reduced page load times by 40% through optimization techniques.
+                                </p>
+                            </div>
+                        </div>
+                        
+                        <div class="timeline-item">
+                            <div class="timeline-marker"><i class='bx bx-code-alt'></i></div>
+                            <div class="timeline-content">
+                                <span class="timeline-date">2020 - 2022</span>
+                                <h3>Full Stack Developer</h3>
+                                <h4>Digital Agency</h4>
+                                <p>
+                                    Developed responsive web applications using React and Node.js. 
+                                    Collaborated with design team to implement pixel-perfect UIs. 
+                                    Integrated third-party APIs and payment gateways.
+                                </p>
+                            </div>
+                        </div>
+                        
+                        <div class="timeline-item">
+                            <div class="timeline-marker"><i class='bx bx-code'></i></div>
+                            <div class="timeline-content">
+                                <span class="timeline-date">2018 - 2020</span>
+                                <h3>Junior Developer</h3>
+                                <h4>Startup XYZ</h4>
+                                <p>
+                                    Built and maintained company website and internal tools. 
+                                    Learned agile methodologies and version control best practices. 
+                                    Participated in code reviews and technical documentation.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Skills Tab -->
+                <div class="tab-content" id="skills">
+                    <div class="skills-container">
+                        <div class="skills-category">
+                            <h3><i class='bx bx-code-curly'></i> Frontend</h3>
+                            <div class="skills-grid">
+                                <div class="skill-item">
+                                    <div class="skill-icon"><i class='bx bxl-html5'></i></div>
+                                    <span>HTML5</span>
+                                    <div class="skill-bar"><div class="skill-progress" data-progress="95"></div></div>
+                                </div>
+                                <div class="skill-item">
+                                    <div class="skill-icon"><i class='bx bxl-css3'></i></div>
+                                    <span>CSS3</span>
+                                    <div class="skill-bar"><div class="skill-progress" data-progress="90"></div></div>
+                                </div>
+                                <div class="skill-item">
+                                    <div class="skill-icon"><i class='bx bxl-javascript'></i></div>
+                                    <span>JavaScript</span>
+                                    <div class="skill-bar"><div class="skill-progress" data-progress="88"></div></div>
+                                </div>
+                                <div class="skill-item">
+                                    <div class="skill-icon"><i class='bx bxl-react'></i></div>
+                                    <span>React</span>
+                                    <div class="skill-bar"><div class="skill-progress" data-progress="85"></div></div>
+                                </div>
+                                <div class="skill-item">
+                                    <div class="skill-icon"><i class='bx bxl-vuejs'></i></div>
+                                    <span>Vue.js</span>
+                                    <div class="skill-bar"><div class="skill-progress" data-progress="75"></div></div>
+                                </div>
+                                <div class="skill-item">
+                                    <div class="skill-icon"><i class='bx bxl-tailwind-css'></i></div>
+                                    <span>Tailwind</span>
+                                    <div class="skill-bar"><div class="skill-progress" data-progress="82"></div></div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="skills-category">
+                            <h3><i class='bx bx-server'></i> Backend</h3>
+                            <div class="skills-grid">
+                                <div class="skill-item">
+                                    <div class="skill-icon"><i class='bx bxl-nodejs'></i></div>
+                                    <span>Node.js</span>
+                                    <div class="skill-bar"><div class="skill-progress" data-progress="85"></div></div>
+                                </div>
+                                <div class="skill-item">
+                                    <div class="skill-icon"><i class='bx bxl-python'></i></div>
+                                    <span>Python</span>
+                                    <div class="skill-bar"><div class="skill-progress" data-progress="80"></div></div>
+                                </div>
+                                <div class="skill-item">
+                                    <div class="skill-icon"><i class='bx bxl-php'></i></div>
+                                    <span>PHP</span>
+                                    <div class="skill-bar"><div class="skill-progress" data-progress="70"></div></div>
+                                </div>
+                                <div class="skill-item">
+                                    <div class="skill-icon"><i class='bx bxl-mongodb'></i></div>
+                                    <span>MongoDB</span>
+                                    <div class="skill-bar"><div class="skill-progress" data-progress="78"></div></div>
+                                </div>
+                                <div class="skill-item">
+                                    <div class="skill-icon"><i class='bx bxl-postgresql'></i></div>
+                                    <span>PostgreSQL</span>
+                                    <div class="skill-bar"><div class="skill-progress" data-progress="75"></div></div>
+                                </div>
+                                <div class="skill-item">
+                                    <div class="skill-icon"><i class='bx bxl-firebase'></i></div>
+                                    <span>Firebase</span>
+                                    <div class="skill-bar"><div class="skill-progress" data-progress="72"></div></div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="skills-category">
+                            <h3><i class='bx bx-wrench'></i> Tools & Others</h3>
+                            <div class="skills-grid">
+                                <div class="skill-item">
+                                    <div class="skill-icon"><i class='bx bxl-git'></i></div>
+                                    <span>Git</span>
+                                    <div class="skill-bar"><div class="skill-progress" data-progress="90"></div></div>
+                                </div>
+                                <div class="skill-item">
+                                    <div class="skill-icon"><i class='bx bxl-docker'></i></div>
+                                    <span>Docker</span>
+                                    <div class="skill-bar"><div class="skill-progress" data-progress="75"></div></div>
+                                </div>
+                                <div class="skill-item">
+                                    <div class="skill-icon"><i class='bx bxl-aws'></i></div>
+                                    <span>AWS</span>
+                                    <div class="skill-bar"><div class="skill-progress" data-progress="70"></div></div>
+                                </div>
+                                <div class="skill-item">
+                                    <div class="skill-icon"><i class='bx bxl-figma'></i></div>
+                                    <span>Figma</span>
+                                    <div class="skill-bar"><div class="skill-progress" data-progress="80"></div></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Education Tab -->
+                <div class="tab-content" id="education">
+                    <div class="timeline">
+                        <div class="timeline-item">
+                            <div class="timeline-marker"><i class='bx bx-book'></i></div>
+                            <div class="timeline-content">
+                                <span class="timeline-date">2014 - 2018</span>
+                                <h3>Bachelor of Science in Computer Science</h3>
+                                <h4>University Name</h4>
+                                <p>
+                                    Graduated with honors. Specialized in software engineering 
+                                    and web development. Participated in hackathons and coding competitions.
+                                </p>
+                            </div>
+                        </div>
+                        
+                        <div class="timeline-item">
+                            <div class="timeline-marker"><i class='bx bx-graduation'></i></div>
+                            <div class="timeline-content">
+                                <span class="timeline-date">2020</span>
+                                <h3>Full Stack Web Development</h3>
+                                <h4>Online Bootcamp</h4>
+                                <p>
+                                    Intensive 6-month program covering modern web technologies. 
+                                    Built multiple full-stack projects using MERN stack.
+                                </p>
+                            </div>
+                        </div>
+                        
+                        <div class="timeline-item">
+                            <div class="timeline-marker"><i class='bx bx-certificate'></i></div>
+                            <div class="timeline-content">
+                                <span class="timeline-date">2021</span>
+                                <h3>AWS Certified Developer</h3>
+                                <h4>Amazon Web Services</h4>
+                                <p>
+                                    Professional certification demonstrating proficiency in 
+                                    developing and maintaining AWS-based applications.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Portfolio Section -->
+        <section class="section portfolio" id="portfolio">
+            <div class="section-header">
+                <h2 class="section-title">Portfolio</h2>
+                <p class="section-subtitle">My recent projects</p>
+            </div>
+            
+            <div class="portfolio-filters">
+                <button class="filter-btn active" data-filter="all">All</button>
+                <button class="filter-btn" data-filter="web">Web Apps</button>
+                <button class="filter-btn" data-filter="mobile">Mobile</button>
+                <button class="filter-btn" data-filter="design">Design</button>
+            </div>
+            
+            <div class="portfolio-grid">
+                <div class="portfolio-item" data-category="web">
+                    <div class="portfolio-image">
+                        <img src="[via.placeholder.com](https://via.placeholder.com/600x400/6c63ff/ffffff?text=Project+1)" alt="Project 1">
+                        <div class="portfolio-overlay">
+                            <div class="portfolio-info">
+                                <h3>E-Commerce Platform</h3>
+                                <p>Full-stack web application</p>
+                                <div class="portfolio-links">
+                                    <a href="#" class="portfolio-link" aria-label="View Live">
+                                        <i class='bx bx-link-external'></i>
+                                    </a>
+                                    <a href="#" class="portfolio-link" aria-label="View Code">
+                                        <i class='bx bxl-github'></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="portfolio-tags">
+                        <span>React</span>
+                        <span>Node.js</span>
+                        <span>MongoDB</span>
+                    </div>
+                </div>
+                
+                <div class="portfolio-item" data-category="mobile">
+                    <div class="portfolio-image">
+                        <img src="[via.placeholder.com](https://via.placeholder.com/600x400/ff6584/ffffff?text=Project+2)" alt="Project 2">
+                        <div class="portfolio-overlay">
+                            <div class="portfolio-info">
+                                <h3>Fitness Tracker App</h3>
+                                <p>Cross-platform mobile app</p>
+                                <div class="portfolio-links">
+                                    <a href="#" class="portfolio-link" aria-label="View Live">
+                                        <i class='bx bx-link-external'></i>
+                                    </a>
+                                    <a href="#" class="portfolio-link" aria-label="View Code">
+                                        <i class='bx bxl-github'></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="portfolio-tags">
+                        <span>React Native</span>
+                        <span>Firebase</span>
+                    </div>
+                </div>
+                
+                <div class="portfolio-item" data-category="web">
+                    <div class="portfolio-image">
+                        <img src="[via.placeholder.com](https://via.placeholder.com/600x400/43d9ad/ffffff?text=Project+3)" alt="Project 3">
+                        <div class="portfolio-overlay">
+                            <div class="portfolio-info">
+                                <h3>Task Management Dashboard</h3>
+                                <p>Productivity web app</p>
+                                <div class="portfolio-links">
+                                    <a href="#" class="portfolio-link" aria-label="View Live">
+                                        <i class='bx bx-link-external'></i>
+                                    </a>
+                                    <a href="#" class="portfolio-link" aria-label="View Code">
+                                        <i class='bx bxl-github'></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="portfolio-tags">
+                        <span>Vue.js</span>
+                        <span>Express</span>
+                        <span>PostgreSQL</span>
+                    </div>
+                </div>
+                
+                <div class="portfolio-item" data-category="design">
+                    <div class="portfolio-image">
+                        <img src="[via.placeholder.com](https://via.placeholder.com/600x400/ffc247/ffffff?text=Project+4)" alt="Project 4">
+                        <div class="portfolio-overlay">
+                            <div class="portfolio-info">
+                                <h3>Brand Identity System</h3>
+                                <p>Complete brand design</p>
+                                <div class="portfolio-links">
+                                    <a href="#" class="portfolio-link" aria-label="View Live">
+                                        <i class='bx bx-link-external'></i>
+                                    </a>
+                                    <a href="#" class="portfolio-link" aria-label="View Details">
+                                        <i class='bx bx-show'></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="portfolio-tags">
+                        <span>Figma</span>
+                        <span>Illustrator</span>
+                    </div>
+                </div>
+                
+                <div class="portfolio-item" data-category="web">
+                    <div class="portfolio-image">
+                        <img src="[via.placeholder.com](https://via.placeholder.com/600x400/4a90d9/ffffff?text=Project+5)" alt="Project 5">
+                        <div class="portfolio-overlay">
+                            <div class="portfolio-info">
+                                <h3>Real-time Chat Application</h3>
+                                <p>WebSocket-based messaging</p>
+                                <div class="portfolio-links">
+                                    <a href="#" class="portfolio-link" aria-label="View Live">
+                                        <i class='bx bx-link-external'></i>
+                                    </a>
+                                    <a href="#" class="portfolio-link" aria-label="View Code">
+                                        <i class='bx bxl-github'></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="portfolio-tags">
+                        <span>Socket.io</span>
+                        <span>React</span>
+                        <span>Redis</span>
+                    </div>
+                </div>
+                
+                <div class="portfolio-item" data-category="mobile">
+                    <div class="portfolio-image">
+                        <img src="[via.placeholder.com](https://via.placeholder.com/600x400/e94560/ffffff?text=Project+6)" alt="Project 6">
+                        <div class="portfolio-overlay">
+                            <div class="portfolio-info">
+                                <h3>Recipe Finder App</h3>
+                                <p>AI-powered recipe suggestions</p>
+                                <div class="portfolio-links">
+                                    <a href="#" class="portfolio-link" aria-label="View Live">
+                                        <i class='bx bx-link-external'></i>
+                                    </a>
+                                    <a href="#" class="portfolio-link" aria-label="View Code">
+                                        <i class='bx bxl-github'></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="portfolio-tags">
+                        <span>Flutter</span>
+                        <span>Python</span>
+                        <span>TensorFlow</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Contact Section -->
+        <section class="section contact" id="contact">
+            <div class="section-header">
+                <h2 class="section-title">Contact Me</h2>
+                <p class="section-subtitle">Let's work together</p>
+            </div>
+            
+            <div class="contact-container">
+                <div class="contact-info">
+                    <h3>Get in Touch</h3>
+                    <p>
+                        I'm always open to discussing new projects, creative ideas, 
+                        or opportunities to be part of your vision.
+                    </p>
+                    
+                    <div class="contact-details">
+                        <div class="contact-item">
+                            <div class="contact-icon">
+                                <i class='bx bx-map'></i>
+                            </div>
+                            <div class="contact-text">
+                                <h4>Location</h4>
+                                <p>City, Country</p>
+                            </div>
+                        </div>
+                        
+                        <div class="contact-item">
+                            <div class="contact-icon">
+                                <i class='bx bx-envelope'></i>
+                            </div>
+                            <div class="contact-text">
+                                <h4>Email</h4>
+                                <p>your.email@example.com</p>
+                            </div>
+                        </div>
+                        
+                        <div class="contact-item">
+                            <div class="contact-icon">
+                                <i class='bx bx-phone'></i>
+                            </div>
+                            <div class="contact-text">
+                                <h4>Phone</h4>
+                                <p>+1 234 567 890</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="contact-social">
+                        <a href="[github.com](https://github.com/yourusername)" target="_blank" aria-label="GitHub">
+                            <i class='bx bxl-github'></i>
+                        </a>
+                        <a href="[linkedin.com](https://linkedin.com/in/yourusername)" target="_blank" aria-label="LinkedIn">
+                            <i class='bx bxl-linkedin'></i>
+                        </a>
+                        <a href="[youtube.com](https://youtube.com/@yourusername)" target="_blank" aria-label="YouTube">
+                            <i class='bx bxl-youtube'></i>
+                        </a>
+                        <a href="[twitter.com](https://twitter.com/yourusername)" target="_blank" aria-label="Twitter">
+                            <i class='bx bxl-twitter'></i>
+                        </a>
+                    </div>
+                </div>
+                
+                <form class="contact-form" id="contact-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="name">Full Name</label>
+                            <input type="text" id="name" name="name" required placeholder="John Doe">
+                            <i class='bx bx-user'></i>
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Email Address</label>
+                            <input type="email" id="email" name="email" required placeholder="john@example.com">
+                            <i class='bx bx-envelope'></i>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="phone">Phone Number</label>
+                            <input type="tel" id="phone" name="phone" placeholder="+1 234 567 890">
+                            <i class='bx bx-phone'></i>
+                        </div>
+                        <div class="form-group">
+                            <label for="subject">Subject</label>
+                            <input type="text" id="subject" name="subject" required placeholder="Project Inquiry">
+                            <i class='bx bx-notepad'></i>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group full-width">
+                        <label for="message">Message</label>
+                        <textarea id="message" name="message" rows="5" required placeholder="Tell me about your project..."></textarea>
+                        <i class='bx bx-message-detail'></i>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary btn-submit">
+                        <span>Send Message</span>
+                        <i class='bx bx-send'></i>
+                    </button>
+                </form>
+            </div>
+        </section>
+    </main>
+    
+    <!-- Scroll to Top Button -->
+    <button class="scroll-top" id="scroll-top" aria-label="Scroll to top">
+        <i class='bx bx-up-arrow-alt'></i>
+    </button>
+    
+    <!-- Three.js -->
+    <script src="[cdnjs.cloudflare.com](https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js)"></script>
+    
+    <!-- Custom JS -->
+    <script src="js/main.js"></script>
+</body>
+</html>
