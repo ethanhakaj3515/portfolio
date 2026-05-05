@@ -628,40 +628,12 @@ class ResumeDownload {
 class ContactForm {
     constructor() {
         this.form = document.getElementById('contact-form');
-        this.recipient = 'ethanhakaj@gmail.com';
-        
         this.init();
     }
     
     init() {
         if (!this.form) return;
-
-        this.form.addEventListener('submit', (e) => this.handleSubmit(e));
-    }
-    
-    handleSubmit(e) {
-        e.preventDefault();
-        
-        const formData = new FormData(this.form);
-        const data = Object.fromEntries(formData);
-        const subject = encodeURIComponent(data.subject || 'Portfolio inquiry');
-        const body = encodeURIComponent(
-            `Name: ${data.name}\nEmail: ${data.email}\nPhone: ${data.phone || 'Not provided'}\n\n${data.message}`
-        );
-
-        window.location.href = `mailto:${this.recipient}?subject=${subject}&body=${body}`;
-
-        const btn = this.form.querySelector('.btn-submit');
-        const originalText = btn.innerHTML;
-        
-        btn.innerHTML = '<span>Message Sent!</span><i class="bx bx-check"></i>';
-        btn.style.background = '#43d9ad';
-        
-        setTimeout(() => {
-            btn.innerHTML = originalText;
-            btn.style.background = '';
-            this.form.reset();
-        }, 3000);
+        this.form.setAttribute('target', '_blank');
     }
 }
 

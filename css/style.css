@@ -369,7 +369,7 @@ textarea {
 
 .section.active {
     opacity: 1;
-    pointer-events: auto;
+    pointer-events: auto !important;
     box-shadow: var(--shadow-lg), var(--shadow-glow), inset 0 0 80px rgba(108, 99, 255, 0.08);
 }
 
@@ -1328,6 +1328,8 @@ textarea {
     background: rgba(255, 255, 255, 0.02);
     border-radius: var(--radius-lg);
     border: 1px solid rgba(255, 255, 255, 0.05);
+    pointer-events: auto;
+    z-index: 1;
 }
 
 .form-row {
@@ -1363,6 +1365,9 @@ textarea {
     color: var(--white);
     font-size: 1rem;
     transition: var(--transition-normal);
+    pointer-events: auto;
+    position: relative;
+    z-index: 1;
 }
 
 .form-group input::placeholder,
@@ -1383,6 +1388,7 @@ textarea {
     color: var(--text-muted);
     font-size: 1.1rem;
     transition: var(--transition-normal);
+    pointer-events: none;
 }
 
 .form-group input:focus + i,
@@ -1400,6 +1406,7 @@ textarea {
     justify-content: center;
     padding: 16px;
     margin-top: 10px;
+    pointer-events: auto;
 }
 
 /* ============================================
