@@ -90,6 +90,59 @@ button {
     background: none;
 }
 
+.nav-link,
+.menu-toggle,
+.btn,
+.social-link,
+.tab-btn,
+.filter-btn,
+.portfolio-link,
+.contact-social a,
+.project-panel-close,
+.scroll-top {
+    will-change: transform, box-shadow, background-color, color;
+}
+
+.nav-link:hover,
+.menu-toggle:hover,
+.btn:hover,
+.social-link:hover,
+.tab-btn:hover,
+.filter-btn:hover,
+.portfolio-link:hover,
+.contact-social a:hover,
+.project-panel-close:hover,
+.scroll-top:hover {
+    transform: translateY(-3px);
+}
+
+.nav-link:active,
+.menu-toggle:active,
+.btn:active,
+.social-link:active,
+.tab-btn:active,
+.filter-btn:active,
+.portfolio-link:active,
+.contact-social a:active,
+.project-panel-close:active,
+.scroll-top:active {
+    transform: translateY(-1px) scale(0.98);
+}
+
+.nav-link:focus-visible,
+.menu-toggle:focus-visible,
+.btn:focus-visible,
+.social-link:focus-visible,
+.tab-btn:focus-visible,
+.filter-btn:focus-visible,
+.portfolio-link:focus-visible,
+.contact-social a:focus-visible,
+.project-panel-close:focus-visible,
+.scroll-top:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+}
+
 input,
 textarea {
     font-family: inherit;
@@ -225,6 +278,13 @@ textarea {
 .nav-link:hover {
     color: var(--white);
     background: rgba(255, 255, 255, 0.05);
+    box-shadow: 0 10px 24px rgba(108, 99, 255, 0.18);
+}
+
+.nav-link:hover i,
+.tab-btn:hover i,
+.filter-btn:hover i {
+    transform: scale(1.12);
 }
 
 .nav-link.active {
@@ -239,6 +299,14 @@ textarea {
     color: var(--white);
     cursor: pointer;
     padding: 5px;
+    border-radius: var(--radius-sm);
+    transition: var(--transition-normal);
+}
+
+.menu-toggle:hover {
+    color: var(--white);
+    background: rgba(108, 99, 255, 0.18);
+    box-shadow: var(--shadow-glow);
 }
 
 /* ============================================
