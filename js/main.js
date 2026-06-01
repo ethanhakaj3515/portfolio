@@ -578,7 +578,7 @@ function initLenis() {
     const lenis = new Lenis({
         lerp:            1.0,
         smoothWheel:     true,
-        wheelMultiplier: 1.4,
+        wheelMultiplier: 2.0,
     });
 
     window._lenis = lenis;
