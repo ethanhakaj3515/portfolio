@@ -1,828 +1,737 @@
-// ============================================
-// Global References
-// ============================================
-let cubeBrowser = null;
-let resumeTabs = null;
-let portfolioFilter = null;
-let portfolioProjects = null;
+'use strict';
 
-// ============================================
-// CSS 3D Website Cube
-// ============================================
-class CubeBrowser {
-    constructor() {
-        this.cube = document.getElementById('site-cube');
-        this.sections = ['home', 'about', 'resume', 'portfolio', 'contact'];
-        this.currentSection = 'home';
-        this.rotations = {
-            home: 'rotateX(0deg) rotateY(0deg)',
-            about: 'rotateX(0deg) rotateY(-90deg)',
-            resume: 'rotateX(-90deg) rotateY(0deg)',
-            portfolio: 'rotateX(90deg) rotateY(0deg)',
-            contact: 'rotateX(0deg) rotateY(90deg)'
-        };
+/* ─── Project data ──────────────────────────────────────────────────────────── */
+const PROJECTS = {
+    ecommerce: {
+        kicker: 'Web Application',
+        title:  'E-Commerce Platform',
+        desc:   'A full-stack e-commerce solution with product management, shopping cart, Stripe payment processing, and an admin dashboard. Built with React and Node.js/Express backed by MongoDB.',
+        tags:   ['React', 'Node.js', 'MongoDB', 'Stripe', 'Redux'],
+        demo:   'https://github.com/ethanhakaj3515',
+        code:   'https://github.com/ethanhakaj3515',
+    },
+    fitness: {
+        kicker: 'Mobile App',
+        title:  'Fitness Tracker App',
+        desc:   'Cross-platform mobile app for tracking workouts, calories, and fitness goals. Real-time progress charts, custom workout plans, and cloud sync via Firebase.',
+        tags:   ['React Native', 'Firebase', 'Expo', 'Redux'],
+        demo:   'https://github.com/ethanhakaj3515',
+        code:   'https://github.com/ethanhakaj3515',
+    },
+    tasks: {
+        kicker: 'Web Application',
+        title:  'Task Management Dashboard',
+        desc:   'Productivity-focused task dashboard with drag-and-drop boards, real-time collaboration, reporting analytics, and integrations with Slack and Google Calendar.',
+        tags:   ['Vue.js', 'Express', 'PostgreSQL', 'Socket.io'],
+        demo:   'https://github.com/ethanhakaj3515',
+        code:   'https://github.com/ethanhakaj3515',
+    },
+    brand: {
+        kicker: 'Design',
+        title:  'Brand Identity System',
+        desc:   'Complete brand identity for a tech startup: logo, typography, color palette, brand guidelines, and full marketing collateral suite, designed and delivered in Figma.',
+        tags:   ['Figma', 'Illustrator', 'Photoshop', 'Design System'],
+        demo:   null,
+        code:   null,
+    },
+    chat: {
+        kicker: 'Web Application',
+        title:  'Real-time Chat App',
+        desc:   'WebSocket-powered messaging app with private and group chats, file sharing, read receipts, and emoji reactions. Scales horizontally with Redis pub/sub.',
+        tags:   ['Socket.io', 'React', 'Redis', 'Node.js', 'PostgreSQL'],
+        demo:   'https://github.com/ethanhakaj3515',
+        code:   'https://github.com/ethanhakaj3515',
+    },
+    recipe: {
+        kicker: 'Mobile App',
+        title:  'Recipe Finder App',
+        desc:   'AI-powered recipe suggestions based on available ingredients. Personalised meal plans, nutritional info, and grocery delivery integration via a Python/FastAPI backend.',
+        tags:   ['Flutter', 'Python', 'TensorFlow', 'Firebase', 'FastAPI'],
+        demo:   'https://github.com/ethanhakaj3515',
+        code:   'https://github.com/ethanhakaj3515',
+    },
+};
 
-        this.init();
-    }
-
-    init() {
-        const initialSection = window.location.hash.replace('#', '');
-        if (this.rotations[initialSection]) {
-            this.currentSection = initialSection;
-        }
-
-        this.bindEvents();
-        this.rotateToSection(this.currentSection, true);
-    }
-
-    bindEvents() {
-        const cubeScene = document.querySelector('.cube-scene');
-        if (cubeScene) {
-            cubeScene.addEventListener('wheel', (event) => this.onWheel(event), { passive: false });
-        }
-    }
-
-    onWheel(event) {
-        const activeSection = document.querySelector('.section.active');
-        if (!activeSection) return;
-
-        const deltaY = event.deltaY;
-        const canScrollUp = activeSection.scrollTop > 0;
-        const canScrollDown = activeSection.scrollTop + activeSection.clientHeight < activeSection.scrollHeight;
-
-        if ((deltaY > 0 && canScrollDown) || (deltaY < 0 && canScrollUp)) {
-            event.preventDefault();
-            activeSection.scrollTop += deltaY;
-        }
-    }
-
-    rotateToSection(sectionId, immediate = false) {
-        if (!this.cube || !this.rotations[sectionId]) return;
-
-        this.currentSection = sectionId;
-        this.cube.classList.toggle('is-transitioning', !immediate);
-
-        if (immediate) {
-            this.cube.style.transition = 'none';
-        }
-
-        this.cube.style.transform = `translateZ(calc(var(--cube-depth) * -1)) ${this.rotations[sectionId]}`;
-
-        document.querySelectorAll('.section').forEach(section => {
-            const isActive = section.id === sectionId;
-            section.classList.toggle('active', isActive);
-            section.setAttribute('aria-hidden', String(!isActive));
-            if (isActive) {
-                section.scrollTop = 0;
-            }
-        });
-
-        document.querySelectorAll('.nav-link').forEach(link => {
-            link.classList.toggle('active', link.getAttribute('data-section') === sectionId);
-        });
-
-        document.getElementById('scroll-top')?.classList.remove('visible');
-        document.dispatchEvent(new CustomEvent('sectionchange', { detail: { sectionId } }));
-        window.history.replaceState(null, '', `#${sectionId}`);
-
-        if (immediate) {
-            requestAnimationFrame(() => {
-                this.cube.style.transition = '';
-            });
-        } else {
-            window.setTimeout(() => {
-                this.cube.classList.remove('is-transitioning');
-            }, 950);
-        }
-    }
-}
-
-// ============================================
-// Navigation & Section Management
-// ============================================
-class Navigation {
-    constructor() {
-        this.header = document.querySelector('.header');
-        this.navbar = document.querySelector('.navbar');
-        this.navLinks = document.querySelectorAll('.nav-link');
-        this.menuToggle = document.getElementById('menu-toggle');
-        
-        this.init();
-    }
-    
-    init() {
-        this.bindEvents();
-    }
-    
-    bindEvents() {
-        this.navLinks.forEach(link => {
-            link.addEventListener('click', (e) => this.handleNavClick(e, link));
-        });
-        
-        this.menuToggle.addEventListener('click', () => this.toggleMobileMenu());
-        
-        document.addEventListener('click', (e) => {
-            if (!this.navbar.contains(e.target) && !this.menuToggle.contains(e.target)) {
-                this.navbar.classList.remove('active');
-                this.menuToggle.setAttribute('aria-expanded', 'false');
-            }
-        });
-    }
-    
-    handleNavClick(e, link) {
-        e.preventDefault();
-        
-        const sectionId = link.getAttribute('data-section');
-        
-        // Rotate cube to section
-        if (cubeBrowser) {
-            cubeBrowser.rotateToSection(sectionId);
-        }
-        
-        // Update active nav link
-        this.navLinks.forEach(l => l.classList.remove('active'));
-        link.classList.add('active');
-        
-        // Close mobile menu
-        this.navbar.classList.remove('active');
-        this.menuToggle.setAttribute('aria-expanded', 'false');
-    }
-    
-    toggleMobileMenu() {
-        this.navbar.classList.toggle('active');
-        this.menuToggle.setAttribute('aria-expanded', String(this.navbar.classList.contains('active')));
-    }
-}
-
-// ============================================
-// Typing Animation
-// ============================================
+/* ─── Typewriter ────────────────────────────────────────────────────────────── */
 class TypeWriter {
-    constructor(element, words, wait = 3000) {
-        this.element = element;
-        this.words = words;
-        this.wait = wait;
-        this.wordIndex = 0;
-        this.txt = '';
-        this.isDeleting = false;
-        
-        this.type();
+    constructor(el, roles, { typeSpeed = 100, deleteSpeed = 55, pause = 2200 } = {}) {
+        this.el          = el;
+        this.roles       = roles;
+        this.typeSpeed   = typeSpeed;
+        this.deleteSpeed = deleteSpeed;
+        this.pause       = pause;
+        this.index       = 0;
+        this.charIndex   = 0;
+        this.deleting    = false;
+        if (el) this._tick();
     }
-    
-    type() {
-        const current = this.wordIndex % this.words.length;
-        const fullTxt = this.words[current];
-        
-        if (this.isDeleting) {
-            this.txt = fullTxt.substring(0, this.txt.length - 1);
+
+    _tick() {
+        const role = this.roles[this.index];
+        if (!this.deleting && this.charIndex < role.length) {
+            this.el.textContent = role.slice(0, ++this.charIndex);
+            setTimeout(() => this._tick(), this.typeSpeed);
+        } else if (!this.deleting) {
+            this.deleting = true;
+            setTimeout(() => this._tick(), this.pause);
+        } else if (this.charIndex > 0) {
+            this.el.textContent = role.slice(0, --this.charIndex);
+            setTimeout(() => this._tick(), this.deleteSpeed);
         } else {
-            this.txt = fullTxt.substring(0, this.txt.length + 1);
+            this.deleting = false;
+            this.index = (this.index + 1) % this.roles.length;
+            setTimeout(() => this._tick(), 420);
         }
-        
-        this.element.innerHTML = this.txt;
-        
-        let typeSpeed = 100;
-        
-        if (this.isDeleting) {
-            typeSpeed /= 2;
-        }
-        
-        if (!this.isDeleting && this.txt === fullTxt) {
-            typeSpeed = this.wait;
-            this.isDeleting = true;
-        } else if (this.isDeleting && this.txt === '') {
-            this.isDeleting = false;
-            this.wordIndex++;
-            typeSpeed = 500;
-        }
-        
-        setTimeout(() => this.type(), typeSpeed);
     }
 }
 
-// ============================================
-// Resume Tabs
-// ============================================
-class ResumeTabs {
+/* ─── Navbar ────────────────────────────────────────────────────────────────── */
+class NavBar {
     constructor() {
-        this.tabs = document.querySelectorAll('.tab-btn');
-        this.contents = document.querySelectorAll('.tab-content');
-        this.transitionTimer = null;
-        
-        this.init();
+        this.header   = document.getElementById('header');
+        this.navbar   = document.getElementById('navbar');
+        this.menuBtn  = document.getElementById('menu-btn');
+        this.navLinks = document.querySelectorAll('.nav-link');
+        this.sections = document.querySelectorAll('section[id], .banner[id]');
+
+        this._bindMenu();
+        this._bindScroll();
+        this._bindLinks();
     }
-    
-    init() {
-        this.tabs.forEach(tab => {
-            tab.addEventListener('click', () => this.switchTab(tab));
-            tab.addEventListener('keydown', (event) => this.handleKeydown(event, tab));
+
+    _bindMenu() {
+        this.menuBtn.addEventListener('click', () => {
+            const open = this.navbar.classList.toggle('open');
+            this.menuBtn.setAttribute('aria-expanded', open);
+            this.menuBtn.querySelector('i').className = open ? 'bx bx-x' : 'bx bx-menu';
         });
 
-        const initialTab = new URLSearchParams(window.location.search).get('resumeTab');
-        const targetTab = document.querySelector(`.tab-btn[data-tab="${initialTab}"]`);
-        if (targetTab) {
-            this.switchTab(targetTab, true);
-        }
-    }
-    
-    switchTab(tab, skipHistory = false) {
-        const targetId = tab.getAttribute('data-tab');
-        const activeContent = document.querySelector('.tab-content.active');
-        const nextContent = document.getElementById(targetId);
-
-        if (!nextContent) return;
-
-        if (activeContent === nextContent) {
-            this.scrollResumeToPanel(nextContent);
-            return;
-        }
-        
-        // Update tabs
-        this.tabs.forEach(t => {
-            t.classList.remove('active');
-            t.setAttribute('aria-selected', 'false');
+        document.addEventListener('click', e => {
+            if (
+                this.navbar.classList.contains('open') &&
+                !this.navbar.contains(e.target) &&
+                !this.menuBtn.contains(e.target)
+            ) this._closeMenu();
         });
-        tab.classList.add('active');
-        tab.setAttribute('aria-selected', 'true');
+    }
 
-        window.clearTimeout(this.transitionTimer);
-        activeContent?.classList.add('is-leaving');
+    _bindLinks() {
+        this.navLinks.forEach(link => {
+            link.addEventListener('click', () => this._closeMenu());
+        });
+        document.querySelectorAll('a[href^="#"]').forEach(a => {
+            a.addEventListener('click', () => this._closeMenu());
+        });
+    }
 
-        this.transitionTimer = window.setTimeout(() => {
-            this.contents.forEach(content => {
-                content.classList.remove('active', 'is-leaving');
+    _closeMenu() {
+        this.navbar.classList.remove('open');
+        this.menuBtn.setAttribute('aria-expanded', 'false');
+        this.menuBtn.querySelector('i').className = 'bx bx-menu';
+    }
+
+    _bindScroll() {
+        const navH = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--nav-h'));
+        window.addEventListener('scroll', () => {
+            /* active link by scroll position */
+            let current = '';
+            this.sections.forEach(sec => {
+                if (window.scrollY >= sec.offsetTop - navH - 60) current = sec.id;
             });
-
-            nextContent.classList.add('active');
-
-            if (targetId === 'skills') {
-                this.animateSkillBars();
-            }
-
-            this.scrollResumeToPanel(nextContent);
-            document.dispatchEvent(new CustomEvent('scrollcontentchange'));
-        }, activeContent ? 220 : 0);
-
-        if (!skipHistory) {
-            const url = new URL(window.location.href);
-            url.hash = 'resume';
-            url.searchParams.set('resumeTab', targetId);
-            window.history.replaceState(null, '', url);
-        }
-    }
-
-    scrollResumeToPanel(panel) {
-        const resumeSection = document.getElementById('resume');
-        if (!resumeSection || !panel) return;
-
-        resumeSection.scrollTo({
-            top: Math.max(panel.offsetTop - 24, 0),
-            behavior: 'smooth'
-        });
-    }
-
-    handleKeydown(event, tab) {
-        if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
-
-        event.preventDefault();
-        const tabs = Array.from(this.tabs);
-        const currentIndex = tabs.indexOf(tab);
-        let nextIndex = currentIndex;
-
-        if (event.key === 'ArrowRight') {
-            nextIndex = (currentIndex + 1) % tabs.length;
-        } else if (event.key === 'ArrowLeft') {
-            nextIndex = (currentIndex - 1 + tabs.length) % tabs.length;
-        } else if (event.key === 'Home') {
-            nextIndex = 0;
-        } else if (event.key === 'End') {
-            nextIndex = tabs.length - 1;
-        }
-
-        tabs[nextIndex].focus();
-        this.switchTab(tabs[nextIndex]);
-    }
-    
-    animateSkillBars() {
-        const skillBars = document.querySelectorAll('.skill-progress');
-        skillBars.forEach(bar => {
-            bar.style.width = '0';
-            setTimeout(() => {
-                const progress = bar.getAttribute('data-progress');
-                bar.style.width = progress + '%';
-            }, 100);
-        });
+            this.navLinks.forEach(l => {
+                l.classList.toggle('active', l.getAttribute('href') === '#' + current);
+            });
+        }, { passive: true });
     }
 }
 
-// ============================================
-// Portfolio Filter
-// ============================================
-class PortfolioFilter {
+/* ─── Skill Bars (IntersectionObserver) ─────────────────────────────────────── */
+class SkillBars {
     constructor() {
-        this.filterBtns = document.querySelectorAll('.filter-btn');
-        this.items = document.querySelectorAll('.portfolio-item');
-        
-        this.init();
-    }
-    
-    init() {
-        this.filterBtns.forEach(btn => {
-            btn.addEventListener('click', () => this.filter(btn));
-        });
+        this.fills   = document.querySelectorAll('.fill[data-pct]');
+        this.section = document.getElementById('skills');
+        this.done    = false;
+        if (!this.section) return;
 
-        const initialFilter = new URLSearchParams(window.location.search).get('portfolioFilter');
-        const targetFilter = document.querySelector(`.filter-btn[data-filter="${initialFilter}"]`);
-        if (targetFilter) {
-            this.filter(targetFilter, true);
-        }
-    }
-    
-    filter(btn, skipHistory = false) {
-        const filter = btn.getAttribute('data-filter');
-        
-        // Update buttons
-        this.filterBtns.forEach(b => {
-            b.classList.remove('active');
-            b.setAttribute('aria-pressed', 'false');
-        });
-        btn.classList.add('active');
-        btn.setAttribute('aria-pressed', 'true');
-        
-        // Filter items
-        this.items.forEach(item => {
-            const category = item.getAttribute('data-category');
-            
-            if (filter === 'all' || category === filter) {
-                item.classList.remove('hidden');
-                item.style.animation = 'fadeIn 0.5s ease';
-            } else {
-                item.classList.add('hidden');
+        const obs = new IntersectionObserver(entries => {
+            if (entries[0].isIntersecting && !this.done) {
+                this.done = true;
+                this.fills.forEach(el => {
+                    el.style.width = Math.min(100, parseInt(el.dataset.pct, 10) || 0) + '%';
+                });
+                obs.disconnect();
             }
-        });
-
-        if (!skipHistory) {
-            const url = new URL(window.location.href);
-            url.hash = 'portfolio';
-            url.searchParams.set('portfolioFilter', filter);
-            window.history.replaceState(null, '', url);
-        }
-
-        document.dispatchEvent(new CustomEvent('scrollcontentchange'));
+        }, { threshold: 0.2 });
+        obs.observe(this.section);
     }
 }
 
-// ============================================
-// Portfolio Project Panel
-// ============================================
-class PortfolioProjects {
+/* ─── Scroll-reveal (IntersectionObserver) ──────────────────────────────────── */
+class ScrollReveal {
     constructor() {
-        this.panel = document.getElementById('project-panel');
-        this.title = document.getElementById('project-panel-title');
-        this.kicker = document.getElementById('project-panel-kicker');
-        this.description = document.getElementById('project-panel-description');
-        this.meta = document.getElementById('project-panel-meta');
-        this.primaryAction = document.querySelector('[data-project-primary]');
-        this.secondaryAction = document.querySelector('[data-project-secondary]');
-        this.closeButton = document.querySelector('[data-project-close]');
-        this.activeTrigger = null;
-        this.activeProject = null;
-        this.activeAction = 'code';
-        this.projects = {
-            ecommerce: {
-                title: 'E-Commerce Platform',
-                type: 'Web App',
-                description: 'A full-stack storefront with product browsing, cart flows, checkout states, and admin-ready product structure.',
-                tags: ['React', 'Node.js', 'MongoDB'],
-                demo: 'https://example.com/e-commerce-platform',
-                code: 'https://github.com/yourusername/e-commerce-platform'
-            },
-            fitness: {
-                title: 'Fitness Tracker App',
-                type: 'Mobile App',
-                description: 'A cross-platform workout tracker for goals, progress history, and Firebase-backed user data.',
-                tags: ['React Native', 'Firebase'],
-                demo: 'https://example.com/fitness-tracker-app',
-                code: 'https://github.com/yourusername/fitness-tracker-app'
-            },
-            tasks: {
-                title: 'Task Management Dashboard',
-                type: 'Web App',
-                description: 'A productivity dashboard with project views, task states, team-oriented filtering, and reporting-ready data.',
-                tags: ['Vue.js', 'Express', 'PostgreSQL'],
-                demo: 'https://example.com/task-management-dashboard',
-                code: 'https://github.com/yourusername/task-management-dashboard'
-            },
-            brand: {
-                title: 'Brand Identity System',
-                type: 'Design',
-                description: 'A cohesive identity package covering color, typography, component rules, and reusable visual assets.',
-                tags: ['Figma', 'Illustrator'],
-                demo: 'https://example.com/brand-identity-system',
-                code: 'https://example.com/brand-identity-system/details'
-            },
-            chat: {
-                title: 'Real-time Chat Application',
-                type: 'Web App',
-                description: 'A WebSocket-based chat experience with live messaging, presence states, and scalable session handling.',
-                tags: ['Socket.io', 'React', 'Redis'],
-                demo: 'https://example.com/realtime-chat-application',
-                code: 'https://github.com/yourusername/realtime-chat-application'
-            },
-            recipe: {
-                title: 'Recipe Finder App',
-                type: 'Mobile App',
-                description: 'An AI-assisted recipe finder that turns preferences and ingredients into practical cooking suggestions.',
-                tags: ['Flutter', 'Python', 'TensorFlow'],
-                demo: 'https://example.com/recipe-finder-app',
-                code: 'https://github.com/yourusername/recipe-finder-app'
-            }
-        };
+        const targets = document.querySelectorAll(
+            '.skill-group, .proj-card, .contact-info, .c-form'
+            /* .sec-head excluded — GSAP word reveal handles those headings */
+        );
+        targets.forEach(el => el.classList.add('reveal'));
 
-        this.init();
+        const obs = new IntersectionObserver(entries => {
+            entries.forEach(e => {
+                if (e.isIntersecting) {
+                    e.target.classList.add('revealed');
+                    obs.unobserve(e.target);
+                }
+            });
+        }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+        targets.forEach(el => obs.observe(el));
+    }
+}
+
+/* ─── Portfolio Modal ───────────────────────────────────────────────────────── */
+class PortfolioModal {
+    constructor() {
+        this.modal    = document.getElementById('modal');
+        this.closeBtn = document.getElementById('modal-close');
+        this.kicker   = document.getElementById('modal-kicker');
+        this.title    = document.getElementById('modal-title');
+        this.desc     = document.getElementById('modal-desc');
+        this.tagsEl   = document.getElementById('modal-tags');
+        this.demoBtn  = document.getElementById('modal-demo');
+        this.codeBtn  = document.getElementById('modal-code');
+        this._bind();
     }
 
-    init() {
-        if (!this.panel) return;
-
-        document.querySelectorAll('[data-project-action]').forEach(link => {
-            link.addEventListener('click', (event) => this.openFromLink(event, link));
+    _bind() {
+        document.addEventListener('click', e => {
+            const btn = e.target.closest('[data-pact]');
+            if (!btn) return;
+            e.preventDefault();
+            const card = btn.closest('[data-pid]');
+            if (!card) return;
+            this._handleAction(card.dataset.pid, btn.dataset.pact);
         });
 
-        this.closeButton?.addEventListener('click', () => this.close());
-        this.panel.addEventListener('click', (event) => {
-            if (event.target === this.panel) {
-                this.close();
-            }
-        });
-        document.addEventListener('keydown', (event) => {
-            if (event.key === 'Escape' && this.panel.classList.contains('active')) {
-                this.close();
-            }
-        });
+        this.closeBtn.addEventListener('click', () => this.close());
+        this.modal.addEventListener('click', e => { if (e.target === this.modal) this.close(); });
+        document.addEventListener('keydown', e => { if (e.key === 'Escape') this.close(); });
     }
 
-    openFromLink(event, link) {
-        event.preventDefault();
-
-        const item = link.closest('.portfolio-item');
-        const project = this.projects[item?.dataset.project];
-        if (!project) return;
-
-        this.activeTrigger = link;
-        this.open(project, link.dataset.projectAction);
+    _handleAction(pid, action) {
+        const p = PROJECTS[pid];
+        if (!p) return;
+        if (action === 'demo' && p.demo) { window.open(p.demo, '_blank', 'noopener,noreferrer'); return; }
+        if (action === 'code' && p.code) { window.open(p.code, '_blank', 'noopener,noreferrer'); return; }
+        this.open(p);
     }
 
-    open(project, action) {
-        this.activeProject = project;
-        this.activeAction = action === 'details' ? 'details' : 'code';
-        this.kicker.textContent = action === 'code' ? 'Code Overview' : project.type;
-        this.title.textContent = project.title;
-        this.description.textContent = project.description;
-        this.meta.innerHTML = project.tags.map(tag => `<span>${tag}</span>`).join('');
-
-        this.primaryAction.onclick = () => this.showActionResult('demo');
-        this.secondaryAction.onclick = () => this.showActionResult(this.activeAction);
-
-        this.primaryAction.innerHTML = '<i class="bx bx-link-external"></i>Open Demo';
-        this.secondaryAction.innerHTML = action === 'details'
-            ? '<i class="bx bx-show"></i>View Details'
-            : '<i class="bx bxl-github"></i>View Code';
-
-        this.panel.classList.add('active');
-        this.panel.setAttribute('aria-hidden', 'false');
-        this.closeButton?.focus();
+    open(p) {
+        this.kicker.textContent = p.kicker;
+        this.title.textContent  = p.title;
+        this.desc.textContent   = p.desc;
+        this.tagsEl.innerHTML   = p.tags.map(t => `<span>${t}</span>`).join('');
+        this._wireBtn(this.demoBtn, p.demo);
+        this._wireBtn(this.codeBtn, p.code);
+        this.modal.classList.add('open');
+        this.modal.setAttribute('aria-hidden', 'false');
+        document.body.style.overflow = 'hidden';
+        this.closeBtn.focus();
     }
 
-    showActionResult(action) {
-        if (!this.activeProject) return;
-
-        const targetUrl = action === 'demo' ? this.activeProject.demo : this.activeProject.code;
-        const actionLabels = {
-            demo: 'Demo Preview',
-            code: 'Code Summary',
-            details: 'Design Details'
-        };
-
-        this.kicker.textContent = actionLabels[action];
-        this.description.textContent = action === 'demo'
-            ? `${this.activeProject.title} demo preview is active. Add your deployed URL later to connect this button to a live build.`
-            : `${this.activeProject.title} ${action === 'details' ? 'details' : 'code'} view is active. Add your final URL later to connect this button externally.`;
-
-        this.meta.innerHTML = [
-            ...this.activeProject.tags,
-            targetUrl
-        ].map(tag => `<span>${tag}</span>`).join('');
-
+    _wireBtn(btn, url) {
+        btn.style.display = url ? '' : 'none';
+        btn.onclick = url ? () => window.open(url, '_blank', 'noopener,noreferrer') : null;
     }
 
     close() {
-        this.panel.classList.remove('active');
-        this.panel.setAttribute('aria-hidden', 'true');
-        this.activeTrigger?.focus();
+        this.modal.classList.remove('open');
+        this.modal.setAttribute('aria-hidden', 'true');
+        document.body.style.overflow = '';
     }
 }
 
-// ============================================
-// Portfolio Images
-// ============================================
-class PortfolioImages {
+/* ─── Contact Form ──────────────────────────────────────────────────────────── */
+class ContactForm {
     constructor() {
-        this.colors = {
-            ecommerce: ['#6c63ff', '#43d9ad'],
-            fitness: ['#ff6584', '#6c63ff'],
-            tasks: ['#43d9ad', '#4a90d9'],
-            brand: ['#ffc247', '#ff6584'],
-            chat: ['#4a90d9', '#6c63ff'],
-            recipe: ['#e94560', '#ffc247']
-        };
-
-        this.init();
+        this.form    = document.getElementById('contact-form');
+        this.banner  = document.getElementById('form-ok');
+        if (!this.form) return;
+        this.sendBtn = this.form.querySelector('.btn-send');
+        this.label   = this.sendBtn.querySelector('span');
+        this.banner.style.cssText = 'height:0;padding:0;margin:0;overflow:hidden;opacity:0';
+        this._bind();
     }
 
-    init() {
-        document.querySelectorAll('.portfolio-item').forEach(item => {
-            const image = item.querySelector('img');
-            const title = item.querySelector('.portfolio-info h3')?.textContent || 'Project';
-            const project = item.dataset.project;
-            const colors = this.colors[project] || ['#6c63ff', '#ff6584'];
+    _bind() {
+        this.form.addEventListener('submit', async e => {
+            e.preventDefault();
+            if (!this.form.checkValidity()) { this.form.reportValidity(); return; }
+            this._setLoading(true);
 
-            if (image) {
-                image.src = this.createProjectImage(title, colors);
+            const payload = {
+                firstName: document.getElementById('f-fname').value.trim(),
+                lastName:  document.getElementById('f-lname').value.trim(),
+                email:     document.getElementById('f-email').value.trim(),
+                phone:     document.getElementById('f-phone').value.trim(),
+                message:   document.getElementById('f-msg').value.trim(),
+            };
+
+            try {
+                const res = await fetch('https://formsubmit.co/ajax/ethanhakaj@gmail.com', {
+                    method:  'POST',
+                    headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+                    body:    JSON.stringify(payload),
+                });
+                res.ok ? this._success() : this._fallback();
+            } catch {
+                this._fallback();
             }
         });
     }
 
-    createProjectImage(title, colors) {
-        const [start, end] = colors;
-        const safeTitle = title.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-        const svg = `
-            <svg xmlns="http://www.w3.org/2000/svg" width="900" height="600" viewBox="0 0 900 600">
-                <defs>
-                    <linearGradient id="g" x1="0" x2="1" y1="0" y2="1">
-                        <stop offset="0" stop-color="${start}"/>
-                        <stop offset="1" stop-color="${end}"/>
-                    </linearGradient>
-                </defs>
-                <rect width="900" height="600" fill="#111119"/>
-                <rect x="70" y="70" width="760" height="460" rx="28" fill="url(#g)" opacity="0.9"/>
-                <rect x="110" y="120" width="680" height="64" rx="14" fill="rgba(255,255,255,0.2)"/>
-                <rect x="110" y="220" width="300" height="210" rx="18" fill="rgba(255,255,255,0.2)"/>
-                <rect x="450" y="220" width="340" height="38" rx="10" fill="rgba(255,255,255,0.26)"/>
-                <rect x="450" y="286" width="280" height="32" rx="10" fill="rgba(255,255,255,0.2)"/>
-                <rect x="450" y="344" width="310" height="32" rx="10" fill="rgba(255,255,255,0.2)"/>
-                <text x="450" y="505" text-anchor="middle" font-family="Lato, Arial, sans-serif" font-size="42" font-weight="700" fill="#ffffff">${safeTitle}</text>
-            </svg>`;
+    _setLoading(on) {
+        this.sendBtn.disabled  = on;
+        this.label.textContent = on ? 'Sending…' : 'Send Message';
+    }
 
-        return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
+    _success() {
+        this._setLoading(false);
+        this.form.reset();
+        this.banner.style.cssText = 'transition:all 0.4s ease';
+        this.banner.style.height  = 'auto';
+        this.banner.style.opacity = '1';
+        this.banner.style.padding = '14px 16px';
+        this.banner.style.marginTop = '14px';
+        setTimeout(() => {
+            this.banner.style.cssText = 'height:0;padding:0;margin:0;overflow:hidden;opacity:0;transition:all 0.35s ease';
+        }, 6000);
+    }
+
+    _fallback() {
+        this._setLoading(false);
+        this.form.removeAttribute('novalidate');
+        this.form.submit();
     }
 }
 
-// ============================================
-// Resume Download
-// ============================================
-class ResumeDownload {
+/* ─── Scroll To Top ─────────────────────────────────────────────────────────── */
+class ScrollTop {
     constructor() {
-        this.button = document.querySelector('[data-download-resume]');
-
-        this.init();
-    }
-
-    init() {
-        if (!this.button) return;
-
-        this.button.addEventListener('click', (event) => this.downloadResume(event));
-    }
-
-    downloadResume(event) {
-        event.preventDefault();
-
-        const resumeSection = document.getElementById('resume');
-        const aboutSection = document.getElementById('about');
-        const resumeText = [
-            document.querySelector('.glitch')?.textContent?.trim() || 'Your Name',
-            '',
-            'ABOUT',
-            aboutSection?.innerText?.trim() || '',
-            '',
-            'RESUME',
-            resumeSection?.innerText?.trim() || ''
-        ].join('\n');
-
-        const blob = new Blob([resumeText], { type: 'text/plain' });
-        const url = URL.createObjectURL(blob);
-        const downloadLink = document.createElement('a');
-
-        downloadLink.href = url;
-        downloadLink.download = 'resume.txt';
-        document.body.appendChild(downloadLink);
-        downloadLink.click();
-        downloadLink.remove();
-        URL.revokeObjectURL(url);
-    }
-}
-
-// ============================================
-// Scroll to Top
-// ============================================
-class ScrollToTop {
-    constructor() {
-        this.button = document.getElementById('scroll-top');
-        this.sections = document.querySelectorAll('.section');
-        
-        this.init();
-    }
-    
-    init() {
-        if (!this.button) return;
-
-        this.sections.forEach(section => {
-            section.addEventListener('scroll', () => this.updateVisibility(), { passive: true });
+        this.btn = document.getElementById('scroll-top');
+        if (!this.btn) return;
+        window.addEventListener('scroll', () => {
+            this.btn.classList.toggle('show', window.scrollY > 400);
+        }, { passive: true });
+        this.btn.addEventListener('click', () => {
+            window._lenis
+                ? window._lenis.scrollTo(0, { duration: 1.5 })
+                : window.scrollTo({ top: 0, behavior: 'smooth' });
         });
-
-        document.addEventListener('sectionchange', () => this.updateVisibility());
-        document.addEventListener('scrollcontentchange', () => this.updateVisibility());
-        window.addEventListener('resize', () => this.updateVisibility());
-        this.button.addEventListener('click', () => this.scrollToTop());
-
-        this.updateVisibility();
-    }
-    
-    getActiveSection() {
-        return document.querySelector('.section.active');
-    }
-
-    updateVisibility() {
-        const section = this.getActiveSection();
-        const canScroll = section && section.scrollHeight > section.clientHeight + 1;
-
-        if (canScroll && section.scrollTop > 80) {
-            this.button.classList.add('visible');
-        } else {
-            this.button.classList.remove('visible');
-        }
-    }
-    
-    scrollToTop() {
-        const section = this.getActiveSection();
-        if (!section) return;
-
-        section.scrollTo({ top: 0, behavior: 'smooth' });
-        requestAnimationFrame(() => this.updateVisibility());
     }
 }
 
-// ============================================
-// Button Action Fallbacks
-// ============================================
-class ButtonActions {
-    constructor() {
-        this.init();
-    }
-
-    init() {
-        document.addEventListener('click', (event) => this.handleClick(event), true);
-    }
-
-    handleClick(event) {
-        const target = event.target.closest('a, button');
-        if (!target) return;
-
-        if (target.matches('[data-download-resume]')) {
-            return;
-        }
-
-        if (target.matches('#menu-toggle')) {
-            return;
-        }
-
-        if (target.matches('.nav-link')) {
-            event.preventDefault();
-            event.stopImmediatePropagation();
-            cubeBrowser?.rotateToSection(target.dataset.section);
-            document.querySelector('.navbar')?.classList.remove('active');
-            return;
-        }
-
-        if (target.matches('[data-section-target]')) {
-            event.preventDefault();
-            event.stopImmediatePropagation();
-            cubeBrowser?.rotateToSection(target.dataset.sectionTarget);
-            document.querySelector('.navbar')?.classList.remove('active');
-            return;
-        }
-
-        if (target.matches('a[href^="#"]')) {
-            const sectionId = target.getAttribute('href').slice(1);
-            if (cubeBrowser?.rotations?.[sectionId]) {
-                event.preventDefault();
-                event.stopImmediatePropagation();
-                cubeBrowser.rotateToSection(sectionId);
-                return;
-            }
-        }
-
-        if (target.matches('.tab-btn')) {
-            event.preventDefault();
-            event.stopImmediatePropagation();
-            resumeTabs?.switchTab(target);
-            return;
-        }
-
-        if (target.matches('.filter-btn')) {
-            event.preventDefault();
-            event.stopImmediatePropagation();
-            portfolioFilter?.filter(target);
-            return;
-        }
-
-        if (target.matches('[data-project-action]')) {
-            event.preventDefault();
-            event.stopImmediatePropagation();
-            portfolioProjects?.openFromLink(event, target);
-            return;
-        }
-
-        if (target.matches('[data-project-close]')) {
-            event.preventDefault();
-            event.stopImmediatePropagation();
-            portfolioProjects?.close();
-            return;
-        }
-
-        if (target.matches('[data-project-primary]')) {
-            event.preventDefault();
-            event.stopImmediatePropagation();
-            portfolioProjects?.showActionResult('demo');
-            return;
-        }
-
-        if (target.matches('[data-project-secondary]')) {
-            event.preventDefault();
-            event.stopImmediatePropagation();
-            portfolioProjects?.showActionResult(portfolioProjects?.activeAction || 'code');
-        }
-    }
-}
-
-// ============================================
-// Initialize Everything
-// ============================================
-document.addEventListener('DOMContentLoaded', () => {
-    cubeBrowser = new CubeBrowser();
-    new ButtonActions();
-    
-    // Initialize navigation
-    new Navigation();
-    
-    // Initialize typing animation
-    const typedElement = document.querySelector('.typed-text');
-    if (typedElement) {
-        new TypeWriter(typedElement, [
-            'Full Stack Developer',
-            'UI/UX Designer',
-            'Creative Problem Solver',
-            'Tech Enthusiast'
-        ], 2000);
-    }
-    
-    // Initialize resume tabs
-    resumeTabs = new ResumeTabs();
-    
-    // Initialize portfolio filter
-    portfolioFilter = new PortfolioFilter();
-
-    // Initialize portfolio project buttons
-    portfolioProjects = new PortfolioProjects();
-
-    // Generate reliable portfolio artwork
-    new PortfolioImages();
-
-    // Initialize resume download
-    new ResumeDownload();
-    
-    // Initialize scroll to top
-    new ScrollToTop();
-    
-    // Handle internal links with data-section
-    document.querySelectorAll('a[href^="#"]').forEach(link => {
-        link.addEventListener('click', (e) => {
-            if (e.defaultPrevented) return;
-
-            const href = link.getAttribute('href');
-            if (href.startsWith('#') && href.length > 1) {
-                const sectionId = href.substring(1);
-                const navLink = document.querySelector(`.nav-link[data-section="${sectionId}"]`);
-                if (navLink) {
-                    e.preventDefault();
-                    navLink.click();
-                }
-            }
+/* ─── CV Download ───────────────────────────────────────────────────────────── */
+function initDownloadCV() {
+    document.querySelectorAll('[data-download-resume]').forEach(btn => {
+        btn.addEventListener('click', e => {
+            e.preventDefault();
+            const a = document.createElement('a');
+            a.href     = 'assets/resume.pdf';
+            a.download = 'Ethan_Hakaj_Resume.pdf';
+            a.click();
         });
     });
+}
 
-    const initialSection = window.location.hash.replace('#', '');
-    if (initialSection) {
-        cubeBrowser.rotateToSection(initialSection, true);
+/* ─── Project card placeholder images ──────────────────────────────────────── */
+function initCardImages() {
+    const palette = {
+        ecommerce: ['#e63946', '#ff6b35'],
+        fitness:   ['#ff6b35', '#06d6a0'],
+        tasks:     ['#06d6a0', '#4a90d9'],
+        brand:     ['#ffc247', '#e63946'],
+        chat:      ['#4a90d9', '#e63946'],
+        recipe:    ['#06d6a0', '#ff6b35'],
+    };
+    document.querySelectorAll('.proj-card[data-pid]').forEach(card => {
+        const img = card.querySelector('.card-img img');
+        if (!img || img.getAttribute('src')) return;
+        const pid = card.dataset.pid;
+        const [c1, c2] = palette[pid] || ['#e63946', '#ff6b35'];
+        const title = (PROJECTS[pid]?.title || pid).replace(/</g, '&lt;');
+        img.src = `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(
+            `<svg xmlns="http://www.w3.org/2000/svg" width="900" height="600" viewBox="0 0 900 600">
+                <defs><linearGradient id="g" x1="0" x2="1" y1="0" y2="1">
+                    <stop offset="0" stop-color="${c1}"/><stop offset="1" stop-color="${c2}"/>
+                </linearGradient></defs>
+                <rect width="900" height="600" fill="#0f0f1a"/>
+                <rect x="60" y="60" width="780" height="480" rx="24" fill="url(#g)" opacity="0.18"/>
+                <rect x="100" y="120" width="700" height="56" rx="12" fill="rgba(255,255,255,0.08)"/>
+                <rect x="100" y="210" width="320" height="200" rx="16" fill="rgba(255,255,255,0.08)"/>
+                <rect x="460" y="210" width="340" height="36" rx="8" fill="rgba(255,255,255,0.10)"/>
+                <rect x="460" y="268" width="280" height="28" rx="8" fill="rgba(255,255,255,0.07)"/>
+                <rect x="460" y="320" width="310" height="28" rx="8" fill="rgba(255,255,255,0.07)"/>
+                <text x="450" y="490" text-anchor="middle" font-family="Inter,Arial,sans-serif"
+                      font-size="36" font-weight="700" fill="${c1}">${title}</text>
+            </svg>`
+        )}`;
+    });
+}
+
+/* ─── Scroll-reveal CSS injection ──────────────────────────────────────────── */
+function injectRevealStyles() {
+    const style = document.createElement('style');
+    style.textContent = `
+        .reveal {
+            opacity: 0;
+            transform: translateY(28px);
+            transition: opacity 0.6s ease, transform 0.6s ease;
+        }
+        .reveal.revealed {
+            opacity: 1;
+            transform: none;
+        }
+        .proj-card.reveal { transition-delay: calc(var(--i, 0) * 80ms); }
+    `;
+    document.head.appendChild(style);
+    /* stagger project cards */
+    document.querySelectorAll('.proj-card').forEach((el, i) => {
+        el.style.setProperty('--i', i % 3);
+    });
+}
+
+/* ─── Magnetic Cursor ───────────────────────────────────────────────────────── */
+class MagneticCursor {
+    constructor() {
+        if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+        if (typeof gsap === 'undefined') return;
+
+        this.dot    = this._make('cursor-dot');
+        this.ring   = this._make('cursor-ring');
+        document.body.append(this.dot, this.ring);
+        document.body.classList.add('cursor-active');
+
+        this.target = { x: -200, y: -200 };
+        this.pos    = { x: -200, y: -200 };
+
+        this._track();
+        this._hover();
+        this._magnetic();
+        this._visibility();
     }
+
+    _make(cls) {
+        const el = document.createElement('div');
+        el.className = cls;
+        return el;
+    }
+
+    _track() {
+        document.addEventListener('mousemove', e => {
+            this.target.x = e.clientX;
+            this.target.y = e.clientY;
+            gsap.set(this.dot, { x: e.clientX, y: e.clientY });
+        }, { passive: true });
+
+        /* Ring follows with lerp each GSAP tick */
+        gsap.ticker.add(() => {
+            this.pos.x += (this.target.x - this.pos.x) * 0.13;
+            this.pos.y += (this.target.y - this.pos.y) * 0.13;
+            gsap.set(this.ring, { x: this.pos.x, y: this.pos.y });
+        });
+    }
+
+    _hover() {
+        document.querySelectorAll('a, button, .proj-card, label').forEach(el => {
+            el.addEventListener('mouseenter', () => {
+                this.ring.classList.add('ring-hover');
+                this.dot.classList.add('dot-hover');
+            });
+            el.addEventListener('mouseleave', () => {
+                this.ring.classList.remove('ring-hover');
+                this.dot.classList.remove('dot-hover');
+            });
+        });
+    }
+
+    /* Buttons physically pull toward the cursor */
+    _magnetic() {
+        document.querySelectorAll('.btn').forEach(btn => {
+            btn.addEventListener('mousemove', e => {
+                const r = btn.getBoundingClientRect();
+                const x = e.clientX - r.left  - r.width  / 2;
+                const y = e.clientY - r.top   - r.height / 2;
+                gsap.to(btn, { x: x * 0.3, y: y * 0.3, duration: 0.4, ease: 'power2.out' });
+            });
+            btn.addEventListener('mouseleave', () => {
+                gsap.to(btn, { x: 0, y: 0, duration: 0.7, ease: 'elastic.out(1, 0.4)' });
+            });
+        });
+    }
+
+    _visibility() {
+        document.addEventListener('mouseleave', () => {
+            gsap.to([this.dot, this.ring], { opacity: 0, duration: 0.2 });
+        });
+        document.addEventListener('mouseenter', () => {
+            gsap.to([this.dot, this.ring], { opacity: 1, duration: 0.2 });
+        });
+    }
+}
+
+/* ─── Text Scramble ─────────────────────────────────────────────────────────── */
+const SCRAMBLE_CHARS = '!<>-_\\/[]{}=+*^?#@$%';
+
+class TextScramble {
+    constructor(el) {
+        this.el   = el;
+        this.orig = el.textContent;
+        this._id  = null;
+        el.addEventListener('mouseenter', () => this._run());
+    }
+
+    _run() {
+        let iter = 0;
+        clearInterval(this._id);
+        this._id = setInterval(() => {
+            this.el.textContent = this.orig
+                .split('')
+                .map((ch, i) => {
+                    if (ch === ' ') return ' ';
+                    if (i < Math.floor(iter)) return this.orig[i];
+                    return SCRAMBLE_CHARS[Math.floor(Math.random() * SCRAMBLE_CHARS.length)];
+                })
+                .join('');
+
+            if (iter >= this.orig.length) {
+                clearInterval(this._id);
+                this.el.textContent = this.orig; /* ensure clean final state */
+            }
+            iter += 0.38;
+        }, 28);
+    }
+}
+
+function initTextScramble() {
+    document.querySelectorAll('.nav-link').forEach(el => new TextScramble(el));
+}
+
+/* ─── tsParticles Hero Background ───────────────────────────────────────────── */
+async function initParticles() {
+    if (typeof tsParticles === 'undefined') return;
+
+    await tsParticles.load('tsparticles', {
+        fpsLimit:      60,
+        detectRetina:  true,
+        background:    { color: 'transparent' },
+        interactivity: {
+            detectsOn: 'window',          /* track mouse through z-stack */
+            events: {
+                onHover: { enable: true,  mode: 'repulse' },
+                onClick: { enable: true,  mode: 'push'    },
+                resize:  true,
+            },
+            modes: {
+                repulse: { distance: 120, duration: 0.5 },
+                push:    { quantity: 3 },
+            },
+        },
+        particles: {
+            number: {
+                value:   70,
+                density: { enable: true, area: 900 },
+            },
+            color: {
+                value: ['#e63946', '#ff6b35', '#c1121f', '#888899'],
+            },
+            opacity: {
+                value:     { min: 0.08, max: 0.45 },
+                animation: { enable: true, speed: 0.8, sync: false },
+            },
+            size: {
+                value:     { min: 1, max: 2.8 },
+                animation: { enable: true, speed: 1.5, sync: false },
+            },
+            links: {
+                enable:   true,
+                color:    '#e63946',
+                opacity:  0.12,
+                distance: 130,
+                width:    1,
+            },
+            move: {
+                enable:    true,
+                speed:     0.6,
+                direction: 'none',
+                random:    true,
+                straight:  false,
+                outModes:  { default: 'bounce' },
+            },
+        },
+    });
+}
+
+/* ─── Lenis Smooth Scroll ───────────────────────────────────────────────────── */
+function initLenis() {
+    if (typeof Lenis === 'undefined') return;
+
+    const lenis = new Lenis({
+        lerp:            1.0,
+        smoothWheel:     true,
+        wheelMultiplier: 1.4,
+    });
+
+    window._lenis = lenis;
+
+    /* Hook into GSAP ticker so scroll is locked to the animation frame */
+    if (typeof gsap !== 'undefined') {
+        if (typeof ScrollTrigger !== 'undefined') lenis.on('scroll', ScrollTrigger.update);
+        gsap.ticker.add(time => lenis.raf(time * 1000));
+        gsap.ticker.lagSmoothing(0);
+    } else {
+        (function raf(time) { lenis.raf(time); requestAnimationFrame(raf); })(0);
+    }
+}
+
+/* ─── Vanilla Tilt (3-D project cards) ──────────────────────────────────────── */
+function initTilt() {
+    if (typeof VanillaTilt === 'undefined') return;
+    /* Only on pointer-capable devices — tilt makes no sense on touch */
+    if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+
+    VanillaTilt.init(document.querySelectorAll('.proj-card'), {
+        max:          10,
+        speed:        400,
+        glare:        true,
+        'max-glare':  0.10,
+        scale:        1.04,
+        perspective:  900,
+        gyroscope:    false,
+    });
+}
+
+/* ─── GSAP Word Reveal (ScrollTrigger) ──────────────────────────────────────── */
+function initWordReveal() {
+    if (typeof gsap === 'undefined' || typeof ScrollTrigger === 'undefined') return;
+    gsap.registerPlugin(ScrollTrigger);
+
+    /* Split text into masked word spans */
+    document.querySelectorAll('.sec-head h1, .sec-head > span').forEach(el => {
+        const words = el.textContent.trim().split(/\s+/);
+        el.innerHTML = words
+            .map(w => `<span class="wr-mask"><span class="wr-word">${w}</span></span>`)
+            .join(' ');
+        /* mark h2 so CSS can safely clear background-clip on the parent */
+        if (el.tagName === 'H1') el.classList.add('words-split');
+
+        gsap.fromTo(
+            el.querySelectorAll('.wr-word'),
+            { yPercent: 110, opacity: 0 },
+            {
+                yPercent: 0,
+                opacity: 1,
+                duration: 0.7,
+                ease: 'power3.out',
+                stagger: 0.1,
+                scrollTrigger: {
+                    trigger: el,
+                    start: 'top 98%',        /* fire as soon as element peeks into view */
+                    toggleActions: 'play none none none',
+                    once: true,
+                },
+            }
+        );
+    });
+
+    /* Refresh after setup so Lenis + ScrollTrigger positions are in sync */
+    ScrollTrigger.refresh();
+}
+
+/* ─── Page intro animation ──────────────────────────────────────────────────── */
+function initPageIntro() {
+    if (typeof gsap === 'undefined') return;
+    gsap.timeline({ defaults: { ease: 'power3.out' } })
+        .from('.header',          { y: -56, opacity: 0, duration: 0.7 })
+        .from('.tagline',         { y: 24,  opacity: 0, duration: 0.5 }, '-=0.3')
+        .from('.glitch',          { y: 24,  opacity: 0, duration: 0.5 }, '-=0.38')
+        .from('.role',            { y: 20,  opacity: 0, duration: 0.45 }, '-=0.36')
+        .from('.bio',             { y: 20,  opacity: 0, duration: 0.45 }, '-=0.36')
+        .from('.cta-row',         { y: 18,  opacity: 0, duration: 0.4  }, '-=0.32')
+        .from('.socials',         { y: 16,  opacity: 0, duration: 0.4  }, '-=0.30')
+        .from('.banner-img',      { scale: 0.88, opacity: 0, duration: 0.65, ease: 'back.out(1.4)' }, '-=0.55');
+}
+
+/* ─── Project Filter (GSAP-powered) ─────────────────────────────────────────── */
+class ProjectFilter {
+    constructor() {
+        this.inputs  = document.querySelectorAll('input[name="filter"]');
+        this.cards   = document.querySelectorAll('.proj-card[data-cat]');
+        if (!this.inputs.length) return;
+        this._busy   = false;
+        this._catMap = { 'f-all': 'all', 'f-web': 'web', 'f-mobile': 'mobile', 'f-design': 'design' };
+        this.inputs.forEach(input => input.addEventListener('change', () => this._run(this._catMap[input.id] || 'all')));
+    }
+
+    _run(cat) {
+        if (this._busy || typeof gsap === 'undefined') return;
+        this._busy = true;
+
+        const visible = [...this.cards].filter(c => c.style.display !== 'none');
+        const toShow  = [...this.cards].filter(c => cat === 'all' || c.dataset.cat === cat);
+        const toHide  = [...this.cards].filter(c => cat !== 'all' && c.dataset.cat !== cat);
+
+        /* ── 1. Fade + lift out current cards ── */
+        gsap.to(visible, {
+            opacity: 0,
+            y: -16,
+            scale: 0.93,
+            duration: 0.22,
+            ease: 'power2.in',
+            stagger: 0.03,
+            onComplete: () => {
+                /* ── 2. Swap visibility ── */
+                toHide.forEach(c => { c.style.display = 'none'; });
+                toShow.forEach(c => {
+                    c.style.display = '';
+                    gsap.set(c, { opacity: 0, y: 24, scale: 1 });
+                });
+
+                /* ── 3. Stagger fade in ── */
+                gsap.to(toShow, {
+                    opacity: 1,
+                    y: 0,
+                    scale: 1,
+                    duration: 0.42,
+                    ease: 'power3.out',
+                    stagger: 0.07,
+                    onComplete: () => { this._busy = false; },
+                });
+            },
+        });
+    }
+}
+
+/* ─── Bootstrap ─────────────────────────────────────────────────────────────── */
+document.addEventListener('DOMContentLoaded', () => {
+    injectRevealStyles();
+    initParticles();
+    initLenis();
+    new MagneticCursor();
+    new NavBar();
+    new TypeWriter(
+        document.querySelector('.typed'),
+        ['Web Developer', 'Web Designer', 'UI/UX Designer'],
+    );
+    new SkillBars();
+    new ScrollReveal();
+    new ProjectFilter();
+    new PortfolioModal();
+    new ContactForm();
+    new ScrollTop();
+    initDownloadCV();
+    initCardImages();
+    initTilt();
+    initTextScramble();
+    initPageIntro();
+    initWordReveal();
 });
