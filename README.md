@@ -1,105 +1,85 @@
-# Portfolio Website
+# Ethan Hakaj — Portfolio
 
-## Overview
+A fully custom single-page portfolio website built with vanilla HTML, CSS, and JavaScript. No frameworks, no build step, no bundler — just static files with a modern red tech aesthetic and a full animation stack powered by CDN libraries.
 
-This repository contains a personal portfolio website built with static HTML, CSS, and JavaScript.
+**Live Site:** [ethanhakaj.github.io/portfolio](https://github.com/ethanhakaj3515/portfolio)
 
-- `index.html` — page structure and content
-- `css/style.css` — styles, layout, typography, and visual design
-- `js/main.js` — interactive behavior and application logic
+---
 
 ## Features
 
-- 3D cube navigation between sections
-- Responsive header and mobile menu
-- Animated typing text on the home section
-- Tabbed resume section with keyboard navigation
-- Portfolio filtering by category
-- Portfolio detail panel for project actions
-- Downloadable resume text file
-- Contact form using `mailto:` submission
-- Scroll-to-top button for long sections
+-  Dark red/orange gradient theme with glitch text and typewriter animations
+-  Physics-based smooth scroll via Lenis
+-  Interactive particle network in the hero section
+-  3D tilt effect on project cards with glare reflection
+-  Custom magnetic cursor with button pull effect
+-  Text scramble animation on nav link hover
+-  GSAP ScrollTrigger word-by-word heading reveals on scroll
+-  Animated project category filtering (All / Web / Mobile / Design)
+-  Async contact form with email relay via formsubmit.co
+-  Fully responsive — touch-safe (animations degrade gracefully on mobile)
 
-## HTML structure
+---
 
-The page is divided into sections:
+## Tech Stack
 
-- `#home`
-- `#about`
-- `#resume`
-- `#portfolio`
-- `#contact`
+| Technology | Version | Purpose |
+|---|---|---|
+| HTML5 / CSS3 / JavaScript (ES6+) | — | Core structure, styling, logic |
+| GSAP + ScrollTrigger | 3.12.5 | Page intro, filter transitions, word reveals |
+| Lenis | 1.0.42 | Smooth scroll with physics-based lerp |
+| tsParticles | 2.12.0 | Hero background particle network |
+| VanillaTilt | 1.8.1 | 3D tilt on project cards |
+| Boxicons | 2.1.4 | Icon set |
+| Inter (Google Fonts) | — | Primary typeface |
+| formsubmit.co | — | Contact form email relay (no backend needed) |
 
-Navigation links use `data-section` attributes so JavaScript can rotate the cube and activate the matching section.
+All libraries are loaded from CDN (jsDelivr / unpkg) — no npm, no build process.
 
-The portfolio items use `data-category` and `data-project` attributes for filtering and dynamic project details.
+---
 
-## CSS
+## Project Structure
 
-The stylesheet defines:
 
-- color palette using CSS variables (`--primary`, `--dark`, `--text`, etc.)
-- layout and spacing values
-- global reset and base styles
-- hover and focus states
-- animation helpers for interactive UI elements
+---
 
-## JavaScript architecture
+## How It Works
 
-The application logic is organized into classes for each feature:
+### Animations
 
-1. `CubeBrowser`
-   - Controls the 3D cube rotation
-   - Maps section IDs to CSS transform states
-   - Activates the visible section and updates the URL hash
-   - Prevents scroll wheel events from unexpectedly moving the page
+Six animation systems run simultaneously, each handling a different interaction layer:
 
-2. `Navigation`
-   - Handles nav link clicks and mobile menu toggling
-   - Updates active navigation state
+**GSAP** drives the page intro sequence (elements cascade in on load), the project filter transitions (cards stagger out then back in), and the ScrollTrigger word reveals (section headings rise word-by-word from behind overflow masks as you scroll).
 
-3. `TypeWriter`
-   - Animates text in the home section by typing and deleting words
+**Lenis** replaces native scroll with a lerp-based smooth scroll, hooked into GSAP's ticker so both run on the same animation frame. The scroll-to-top button calls `lenis.scrollTo()` for consistency.
 
-4. `ResumeTabs`
-   - Switches resume content tabs
-   - Updates browser history state
-   - Supports keyboard navigation
-   - Animates skill bars when active
+**tsParticles** renders an interactive canvas behind the hero section. 70 nodes drift and draw connecting lines within 130px of each other. Mouse position is tracked globally so particles repulse away from the cursor even though the canvas sits behind the content.
 
-5. `PortfolioFilter`
-   - Filters portfolio items by category
-   - Hides non-matching items and updates state
+**VanillaTilt** applies 3D perspective tilt to every project card. The card follows the cursor up to 10° on both axes, scales up slightly, and shows a glare sweep. Only initialised on pointer-capable devices (`(hover: hover) and (pointer: fine)`).
 
-6. `PortfolioProjects`
-   - Opens project detail panel from portfolio item actions
-   - Loads project metadata and action buttons
-   - Closes panel on overlay click or Escape key
+**Custom Magnetic Cursor** hides the system cursor and replaces it with a dot (instant) and a ring (lerp-lagged). Buttons physically pull toward the cursor as you hover them and elastically spring back on leave.
 
-7. `PortfolioImages`
-   - Generates inline SVG preview images for project cards
+**Text Scramble** cycles random characters on nav link hover before revealing the real word left-to-right — built in ~30 lines of vanilla JS, no library.
 
-8. `ResumeDownload`
-   - Creates a downloadable plain-text resume from page content
+### Project Filtering
 
-9. `ContactForm`
-   - Builds a `mailto:` link with submitted form data
-   - Shows temporary success feedback
+Filter tabs use `<input type="radio">` elements with CSS-styled `<label>` pills. On selection, the `ProjectFilter` class intercepts the `change` event, stagger-animates visible cards out via GSAP, swaps visibility with `display: none/''`, then stagger-animates matching cards back in. A `_busy` flag prevents animation interruption during transitions.
 
-10. `ScrollToTop`
-    - Displays the scroll-to-top button when a section is scrollable
-    - Smoothly scrolls the active section back to top
+### Contact Form
 
-11. `ButtonActions`
-    - Global click handler for fallback behavior
-    - Ensures links and buttons route through the right JavaScript interactions
+On submit, the form POSTs as JSON to **formsubmit.co** via `fetch()` using their AJAX endpoint — no backend required. On success, a confirmation banner animates in and auto-dismisses after 6 seconds. On network failure, it falls back to a native HTML form submit.
 
-## Initialization
+---
 
-On page load, the script initializes the cube, navigation, typing animation, resume tabs, portfolio filter, project panel, resume download button, contact form, and scroll-to-top control.
+## Running Locally
 
-Internal anchor links are also intercepted to keep the cube interface working correctly.
+No install required. Just serve the folder with any static file server:
 
-## Notes
+```bash
+# Using Python
+python -m http.server 3000
 
-This is a static site and does not include a backend. The contact form uses the user's email client, and the resume download generates a `.txt` file in the browser.
+# Using Node.js
+npx serve .
+
+# Or simply open index.html in your browser
